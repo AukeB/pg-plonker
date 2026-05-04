@@ -1,5 +1,5 @@
 # Default project folder
-PROJECT_NAME = src/my_project
+PROJECT_NAME = src/pg_plonker
 
 # Format and lint code with Ruff
 ruff:
@@ -11,18 +11,6 @@ ruff:
 ty:
 	uv run ty check
 	@echo "🔍 Successfully executed ty."
-
-# Run tests with Pytest
-# -vvvs: Very verbose output, shows print() statements and extra test details
-# --cov=$(PROJECT_NAME): Measure test coverage for the project
-# --cov-report=term-missing: Show which lines are missing coverage
-# --cov-branch: Track branch coverage, not just line coverage
-pytest:
-	uv run pytest tests -vvvs \
-		--cov=$(PROJECT_NAME) \
-		--cov-report=term-missing \
-		--cov-branch
-	@echo "🧪 Successfully executed pytest."
 
 # Remove caches and temporary files
 clean:
@@ -48,7 +36,6 @@ git:
 all:
 	make ruff
 	make ty
-	make pytest
 	make clean
 	make git
 	@echo "⚡ Successfully executed all tasks."

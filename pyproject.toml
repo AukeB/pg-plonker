@@ -1,7 +1,7 @@
 [project]
-name = "template-repo"
+name = "pg-plonker"
 version = "0.1.0"
-description = "Add your description here"
+description = "pg-plonker is a lightweight pygame extension for plonking GUI elements down on your pygame window"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -14,8 +14,6 @@ dependencies = [
 [dependency-groups]
 dev = [
     "prek>=0.3.8",
-    "pytest>=8.4.2",
-    "pytest-cov>=7.0.0",
     "ruff>=0.11.6",
     "ty>=0.0.29",
 ]

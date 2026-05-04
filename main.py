@@ -1,54 +1,49 @@
-"""Module for running the main repository workflow."""
+"""Module for testing the pygame_ui Button class."""
+
+import pygame as pg
+
+from src.pg_plonker.controls.button import Button
+from src.pg_plonker.gui_config_models import UIConfig
+from src.pg_plonker.utils import get_window_size_from_screen_resolution
 
 
 def main() -> None:
-    """
-    Load configuration and print the loaded settings.
+    config = UIConfig()
 
-    1. Instantiate ConfigManager and load the config file.
-    2. Print the loaded configuration as YAML.
-    """
-    import yaml
-
-    from src.my_project.config_manager import ConfigManager
-
-    manager = ConfigManager()
-    config = manager.load_config_file()
-
-    print("Loaded config:")
-    print(yaml.safe_dump(config.model_dump(), sort_keys=False, default_flow_style=False))
-
-
-def main_with_pygame_initialisation() -> None:
-    """
-    Load configuration and launch a scaled pygame window.
-
-    1. Instantiate ConfigManager and load the config file.
-    2. Initialise pygame and resolve window dimensions from screen size.
-    3. Create the display surface and run the event loop until the window is closed.
-    """
-    import pygame as pg
-
-    from src.my_project.config_manager import ConfigManager
-    from src.my_project.utils.utils_pygame import get_window_size_from_screen_resolution
-
-    # Config
-    manager = ConfigManager()
-    manager.load_config_file()
-
-    # Pygame init
     pg.init()
-    width, height = get_window_size_from_screen_resolution()
-    
-    pg.display.set_mode((width, height))
-    pg.display.set_caption("my_project")
+    window_size = get_window_size_from_screen_resolution()
+    screen = pg.display.set_mode(window_size)
+    pg.display.set_caption("pygame_ui test")
 
-    # Event loop
-    running: bool = True
+    window_width, window_height = window_size
+    
+    button_rect = pg.Rect(
+        (window_width - config.button.width) // 2,
+        (window_height - config.button.height) // 2,
+        config.button.width,
+        config.button.height,
+    )
+
+    toggle_button = Button(
+        surface=screen,
+        rect=button_rect,
+        text="Toggle grid",
+        state=False,
+    )
+
+    running = True
     while running:
         for event in pg.event.get():
-            if event.type == pg.QUIT:
+            if event.type == pg.QUIT or (
+                event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE
+            ):
                 running = False
+
+            toggle_button.handle_event(event)
+
+        screen.fill(config.panel.color_background)
+        toggle_button.draw()
+        pg.display.flip()
 
     pg.quit()
 

@@ -1,8 +1,8 @@
-"""Module for pygame-specific display and initialisation utilities."""
+"""Utility module with helper functions."""
 
 import pygame as pg
 
-from src.my_project.constants import WINDOW_SIZE_SCREEN_FRACTION
+from src.pg_plonker.constants import WINDOW_SIZE_SCREEN_FRACTION
 
 
 def get_window_size_from_screen_resolution(
