@@ -3,6 +3,7 @@
 import pygame as pg
 
 from src.pg_plonker.gui_panel import GUIPanel
+from src.pg_plonker.controls.button import Button
 from src.pg_plonker.utils import get_window_size_from_screen_resolution
 
 
@@ -10,9 +11,17 @@ def main() -> None:
     pg.init()
     window_size = get_window_size_from_screen_resolution()
     screen = pg.display.set_mode(window_size)
-    pg.display.set_caption("pygame_ui test")
+    pg.display.set_caption("PyGame Plonker")
     
-    gui_panel = GUIPanel(surface=screen, right_side=False)
+    gui_panel = GUIPanel(surface=screen)
+
+    button = Button(
+        surface=screen,
+        rect=pg.Rect(0, 0, 800, 200),
+        text="Press me"
+    )
+
+    gui_panel.add(button=button)
 
     running = True
     while running:

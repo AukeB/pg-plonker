@@ -71,7 +71,7 @@ class Button:
             event (pg.event.Event): The pygame event to handle.
 
         Returns:
-            changed (bool): True if the state changed, False otherwise.
+            (bool): True if the state changed, False otherwise.
         """
         if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
             if self.rect.collidepoint(event.pos):
