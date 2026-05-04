@@ -3,21 +3,16 @@
 import pygame as pg
 
 from src.pg_plonker.gui_panel import GUIPanel
-from src.pg_plonker.gui_config_models import PGPlonkerConfig
 from src.pg_plonker.utils import get_window_size_from_screen_resolution
 
 
 def main() -> None:
-    config = PGPlonkerConfig()
-
     pg.init()
     window_size = get_window_size_from_screen_resolution()
     screen = pg.display.set_mode(window_size)
     pg.display.set_caption("pygame_ui test")
-
-    window_width, window_height = window_size
     
-    gui_panel = GUIPanel(surface=screen)
+    gui_panel = GUIPanel(surface=screen, right_side=False)
 
     running = True
     while running:
