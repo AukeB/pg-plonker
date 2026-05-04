@@ -4,9 +4,9 @@ import pygame as pg
 from pygame import Rect, Surface
 from pygame.font import Font
 
-from src.pg_plonker.gui_config_models import ButtonConfig, RGBColor, UIConfig
+from src.pg_plonker.gui_config_models import ButtonConfig, PGPlonkerConfig, RGBColor
 
-_default = UIConfig()
+_default = PGPlonkerConfig()
 
 
 def button(

@@ -2,13 +2,13 @@
 
 import pygame as pg
 
-from src.pg_plonker.controls.button import Button
-from src.pg_plonker.gui_config_models import UIConfig
+from src.pg_plonker.gui_panel import GUIPanel
+from src.pg_plonker.gui_config_models import PGPlonkerConfig
 from src.pg_plonker.utils import get_window_size_from_screen_resolution
 
 
 def main() -> None:
-    config = UIConfig()
+    config = PGPlonkerConfig()
 
     pg.init()
     window_size = get_window_size_from_screen_resolution()
@@ -17,19 +17,7 @@ def main() -> None:
 
     window_width, window_height = window_size
     
-    button_rect = pg.Rect(
-        (window_width - config.button.width) // 2,
-        (window_height - config.button.height) // 2,
-        config.button.width,
-        config.button.height,
-    )
-
-    toggle_button = Button(
-        surface=screen,
-        rect=button_rect,
-        text="Toggle grid",
-        state=False,
-    )
+    gui_panel = GUIPanel(surface=screen)
 
     running = True
     while running:
@@ -39,10 +27,8 @@ def main() -> None:
             ):
                 running = False
 
-            toggle_button.handle_event(event)
-
-        screen.fill(config.panel.color_background)
-        toggle_button.draw()
+        screen.fill((255, 255, 255))
+        gui_panel.draw()
         pg.display.flip()
 
     pg.quit()

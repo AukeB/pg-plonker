@@ -5,9 +5,9 @@ from pygame import Rect, Surface
 from pygame.font import Font
 
 from src.pg_plonker import draw
-from src.pg_plonker.gui_config_models import ButtonConfig, UIConfig
+from src.pg_plonker.gui_config_models import ButtonConfig, PGPlonkerConfig
 
-_default = UIConfig()
+_default = PGPlonkerConfig()
 
 
 class Button:

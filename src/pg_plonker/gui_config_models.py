@@ -31,18 +31,18 @@ class ButtonConfig:
 
 
 @dataclass(frozen=True)
-class PanelConfig:
+class GUIPanelConfig:
     """ """
 
-    width: int = 220
+    width: int = 620
     border_width: int = 2
-    color_background: RGBColor = (255, 255, 255)
+    color_background: RGBColor = (230, 230, 230)
     color_border: RGBColor = (0, 0, 0)
 
 
 @dataclass(frozen=True)
-class UIConfig:
-    """Top-level configuration for the pygame UI panel and its controls."""
+class PGPlonkerConfig:
+    """Top-level configuration for the pg_plonker package."""
 
-    panel: PanelConfig = field(default_factory=PanelConfig)
+    gui_panel: GUIPanelConfig = field(default_factory=GUIPanelConfig)
     button: ButtonConfig = field(default_factory=ButtonConfig)
