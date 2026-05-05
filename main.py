@@ -47,7 +47,11 @@ TODO:
 BUGS/CODE IMPROVEMENTS
 - All the 'or' statements have a weakness. For example if equal to 0, False, or "" empty strings.
 
-FEATURES
+FEATURE: IMPROVING BUTTONS:
 - Button click animations so that you can actually see the button being pressed
 - Sound animations when button clicking
+
+FEATURE: EXPANDING PACKAGE WITH MORE GUI ELEMENTS
+- Add sliders
+- Add drop-down lists.
 """
