@@ -2,6 +2,9 @@
 
 from dataclasses import dataclass, field
 
+import pygame as pg
+from pygame.font import Font
+
 type RGBColor = tuple[int, int, int]
 
 
@@ -9,18 +12,19 @@ type RGBColor = tuple[int, int, int]
 class ButtonConfig:
     """ """
 
-    # Related to sizes.
+    # Text and font settings.
+    text: str = "Button"
+    font_name: str = "arial"
+    font_size: int = 50
+
+    # Size and distance settings.
     width: int = 540
     height: int = 108
     border_width: int = 5
     border_width_inner: int = 3
-    shadow_offset: int = 3
+    text_shadow_offset: int = 3
 
-    # Related to the font.
-    font_type: str = "arial"
-    font_size: int = 50
-
-    # Related to colors.
+    # Color settings.
     color_background_active: RGBColor = (200, 150, 150)
     color_background_inactive: RGBColor = (150, 150, 150)
     color_text: RGBColor = (255, 255, 255)
@@ -34,8 +38,16 @@ class ButtonConfig:
 class GUIPanelConfig:
     """ """
 
+    # Size and distance settings.
     width: int = 620
     border_width: int = 2
+    margin_gui_panel: int = 20
+    margin_button: int = 12
+
+    # Position
+    align_right: bool = True
+
+    # Color settings.
     color_background: RGBColor = (230, 230, 230)
     color_border: RGBColor = (0, 0, 0)
 

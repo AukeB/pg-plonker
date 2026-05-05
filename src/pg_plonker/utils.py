@@ -4,6 +4,31 @@ import pygame as pg
 
 from src.pg_plonker.constants import WINDOW_SIZE_SCREEN_FRACTION
 
+_font_cache: dict[tuple[str, int], pg.font.Font] = {}
+
+
+def _get_font(font_name: str, font_size: int) -> pg.font.Font:
+    """
+    Retrieve a font from cache, creating and caching it if not yet loaded.
+
+    pg.font.SysFont is expensive to call and should never be invoked
+    every frame. This function ensures each unique (font_name, font_size)
+    combination is created only once and reused for all subsequent calls.
+
+    Args:
+        font_name (str): The system font name to load.
+        font_size (int): The font size in points.
+
+    Returns:
+        font (pg.font.Font): The cached font object.
+    """
+    key = (font_name, font_size)
+    if key not in _font_cache:
+        _font_cache[key] = pg.font.SysFont(name=font_name, size=font_size)
+    result = _font_cache[key]
+
+    return result
+
 
 def get_window_size_from_screen_resolution(
     monitor_index: int = 0,
