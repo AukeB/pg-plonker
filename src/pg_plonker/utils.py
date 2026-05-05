@@ -7,7 +7,7 @@ from src.pg_plonker.constants import WINDOW_SIZE_SCREEN_FRACTION
 _font_cache: dict[tuple[str, int], pg.font.Font] = {}
 
 
-def _get_font(font_name: str, font_size: int) -> pg.font.Font:
+def get_font(font_name: str, font_size: int) -> pg.font.Font:
     """
     Retrieve a font from cache, creating and caching it if not yet loaded.
 

@@ -1,7 +1,7 @@
 """Module for the stateful Button control."""
 
 import pygame as pg
-from pygame import Rect, Surface
+from pygame import Surface
 
 from src.pg_plonker import draw
 from src.pg_plonker.gui_config_models import ButtonConfig, RGBColor
@@ -35,29 +35,35 @@ class Button:
         state: bool = False,
     ) -> None:
         """
-        Initialize the button with its surface, position, and visual parameters.
+        Initialize a Button instance with rendering surface, position, and visual configuration.
 
-        All visual parameters are optional and fall back to the module-level
-        PGPlonkerConfig when not provided. They are stored as-is and forwarded
-        to draw.button each frame, where the fallback logic is applied.
+        The Button is a stateful UI element that can toggle between active and inactive states.
+        It stores its geometry and visual configuration and delegates rendering to the
+        stateless `draw.button` function each frame.
+
+        All visual parameters are optional and fall back to defaults defined in
+        `ButtonConfig` / `PGPlonkerConfig` when not provided.
 
         Args:
-            surface (Surface): The pygame surface to draw onto.
-            rect (Rect): The position and dimensions of the button.
+            surface (Surface): The pygame surface the button will be drawn onto.
+            x (int): X-position of the button in pixels (screen or panel-local space).
+            y (int): Y-position of the button in pixels (screen or panel-local space).
+            width (int | None): Button width in pixels, defaults to config value if None.
+            height (int | None): Button height in pixels, defaults to config value if None.
             text (str | None): Label rendered inside the button.
-            font_name (str | None): System font name.
-            font_size (int | None): Font size in points.
+            font_name (str | None): System font name used for rendering text.
+            font_size (int | None): Font size in points for button text.
             border_width (int | None): Outer border thickness in pixels.
             border_width_inner (int | None): Inner border thickness in pixels.
-            text_shadow_offset (int | None): Shadow offset in pixels.
-            color_background_active (RGBColor | None): Fill color when active.
-            color_background_inactive (RGBColor | None): Fill color when inactive.
-            color_text (RGBColor | None): Text color.
+            text_shadow_offset (int | None): Pixel offset used for text shadow rendering.
+            color_background_active (RGBColor | None): Background color when active.
+            color_background_inactive (RGBColor | None): Background color when inactive.
+            color_text (RGBColor | None): Color of the button text.
             color_border (RGBColor | None): Outer border color.
-            color_border_inner_light (RGBColor | None): Light inner border color.
-            color_border_inner_dark (RGBColor | None): Dark inner border color.
-            color_text_shadow (RGBColor | None): Text shadow color.
-            state (bool): Initial toggle state, defaults to False.
+            color_border_inner_light (RGBColor | None): Light inner border highlight color.
+            color_border_inner_dark (RGBColor | None): Dark inner border shadow color.
+            color_text_shadow (RGBColor | None): Color of the text shadow.
+            state (bool): Initial toggle state of the button (False = inactive, True = active).
         """
         # Display.
         self.surface = surface

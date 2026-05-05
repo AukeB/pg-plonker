@@ -1,7 +1,7 @@
 [project]
 name = "pg-plonker"
 version = "0.1.0"
-description = "pg-plonker is a lightweight pygame extension for plonking GUI elements down on your pygame window"
+description = "pg-plonker is a lightweight PyGame extension for plonking GUI elements down on your PyGame window"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -20,8 +20,9 @@ dev = [
 
 [tool.ruff.lint]
 select = [
+    "F",    # Includes removing unused imports
     "I",    # isort-style import sorting
-    "ANN",  # annotation rules
+    "ANN",  # Annotation rules
 ]
 
 [tool.ruff.lint.isort]

@@ -4,7 +4,7 @@ import pygame as pg
 from pygame import Surface
 
 from src.pg_plonker.gui_config_models import ButtonConfig, RGBColor
-from src.pg_plonker.utils import _get_font
+from src.pg_plonker.utils import get_font
 
 _config_button = ButtonConfig()
 
@@ -78,7 +78,7 @@ def button(
     # Definitions depending on function/config input.
     rect = pg.Rect(x, y, width, height)
     inner_rect = rect.inflate(-border_width * 2, -border_width * 2)
-    font = _get_font(font_name=font_name, font_size=font_size)
+    font = get_font(font_name=font_name, font_size=font_size)
 
     # Drawing operations.
     pg.draw.rect(surface, color_background, rect)
