@@ -2,8 +2,8 @@
 
 import pygame as pg
 
-from src.pg_plonker.gui_panel import GUIPanel
-from src.pg_plonker.utils import get_window_size_from_screen_resolution
+from pg_plonker.gui_panel import GUIPanel
+from pg_plonker.utils import get_window_size_from_screen_resolution
 
 
 def main() -> None:

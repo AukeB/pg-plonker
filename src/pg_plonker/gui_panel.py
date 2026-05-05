@@ -3,8 +3,8 @@
 import pygame as pg
 from pygame import Rect, Surface
 
-from src.pg_plonker.controls.button import Button
-from src.pg_plonker.gui_config_models import GUIPanelConfig, RGBColor
+from pg_plonker.controls.button import Button
+from pg_plonker.gui_config_models import GUIPanelConfig, RGBColor
 
 _config_gui_panel = GUIPanelConfig()
 

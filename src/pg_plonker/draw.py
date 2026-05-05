@@ -3,8 +3,8 @@
 import pygame as pg
 from pygame import Surface
 
-from src.pg_plonker.gui_config_models import ButtonConfig, RGBColor
-from src.pg_plonker.utils import get_font
+from pg_plonker.gui_config_models import ButtonConfig, RGBColor
+from pg_plonker.utils import get_font
 
 _config_button = ButtonConfig()
 

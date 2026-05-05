@@ -2,7 +2,7 @@
 
 import pygame as pg
 
-from src.pg_plonker.constants import WINDOW_SIZE_SCREEN_FRACTION
+from pg_plonker.constants import WINDOW_SIZE_SCREEN_FRACTION
 
 _font_cache: dict[tuple[str, int], pg.font.Font] = {}
 
