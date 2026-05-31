@@ -122,7 +122,7 @@ class GUIPanel:
     ) -> Button:
         """Create a Button, register it with the panel, and assign automatic layout.
 
-        The button is created using the panel's subsurface so that it operates in panel-local
+        The button is created using the panel's subsurface so that it operates in panel- local
         coordinate space. Its final position is determined by the panel's layout system (vertical
         stacking with centering).
 

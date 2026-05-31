@@ -31,6 +31,7 @@ known-first-party = ["src"]
 
 [tool.docstring_tailor]
 line-length = 100
+style = "google"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
