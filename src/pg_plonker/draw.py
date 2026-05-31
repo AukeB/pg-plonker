@@ -28,13 +28,11 @@ def button(
     color_border_inner_dark: RGBColor | None = None,
     color_text_shadow: RGBColor | None = None,
 ) -> None:
-    """
-    Draw a single button onto the given surface.
+    """Draw a single button onto the given surface.
 
-    All parameters except surface are optional and fall back to the values
-    defined in the module-level ButtonConfig when not provided. This allows
-    quick usage with minimal arguments while still permitting per-call
-    overrides of any visual property.
+    All parameters except surface are optional and fall back to the values defined in the module-
+    level ButtonConfig when not provided. This allows quick usage with minimal arguments while still
+    permitting per-call overrides of any visual property.
 
     Args:
         surface (Surface): The pygame surface to draw onto.
@@ -46,13 +44,16 @@ def button(
         font_name (str | None): System font name, overrides config if provided.
         font_size (int | None): Font size in points, overrides config if provided.
         border_width (int | None): Outer border thickness in pixels, overrides config if provided.
-        border_width_inner (int | None): Inner border thickness in pixels, overrides config if provided.
+        border_width_inner (int | None): Inner border thickness in pixels, overrides config if
+            provided.
         text_shadow_offset (int | None): Shadow offset in pixels, overrides config if provided.
         color_background (RGBColor | None): Background fill color, overrides config if provided.
         color_text (RGBColor | None): Text color, overrides config if provided.
         color_border (RGBColor | None): Outer border color, overrides config if provided.
-        color_border_inner_light (RGBColor | None): Light inner border color, overrides config if provided.
-        color_border_inner_dark (RGBColor | None): Dark inner border color, overrides config if provided.
+        color_border_inner_light (RGBColor | None): Light inner border color, overrides config if
+            provided.
+        color_border_inner_dark (RGBColor | None): Dark inner border color, overrides config if
+            provided.
         color_text_shadow (RGBColor | None): Text shadow color, overrides config if provided.
     """
     # Get all arguments, either from function input or config.

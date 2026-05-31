@@ -34,15 +34,14 @@ class Button:
         color_text_shadow: RGBColor | None = None,
         state: bool = False,
     ) -> None:
-        """
-        Initialize a Button instance with rendering surface, position, and visual configuration.
+        """Initialize a Button instance with rendering surface, position, and visual configuration.
 
         The Button is a stateful UI element that can toggle between active and inactive states.
-        It stores its geometry and visual configuration and delegates rendering to the
-        stateless `draw.button` function each frame.
+        It stores its geometry and visual configuration and delegates rendering to the stateless
+        `draw.button` function each frame.
 
-        All visual parameters are optional and fall back to defaults defined in
-        `ButtonConfig` / `PGPlonkerConfig` when not provided.
+        All visual parameters are optional and fall back to defaults defined in `ButtonConfig` /
+        `PGPlonkerConfig` when not provided.
 
         Args:
             surface (Surface): The pygame surface the button will be drawn onto.
@@ -125,8 +124,7 @@ class Button:
         )
 
     def handle_event(self, event: pg.event.Event) -> bool:
-        """
-        Toggle state on mouse release if the button was pressed down on this control.
+        """Toggle state on mouse release if the button was pressed down on this control.
 
         Args:
             event (pg.event.Event): The pygame event to handle.

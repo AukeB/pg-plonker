@@ -7,14 +7,13 @@ type RGBColor = tuple[int, int, int]
 
 @dataclass(frozen=True)
 class ButtonConfig:
-    """
-    Configuration container for visual and layout properties of a Button.
+    """Configuration container for visual and layout properties of a Button.
 
-    Defines all default styling, sizing, and typography parameters used by
-    Button instances when no explicit overrides are provided.
+    Defines all default styling, sizing, and typography parameters used by Button instances when
+    no explicit overrides are provided.
 
-    This includes dimensions, border styling, text rendering settings, and
-    color definitions for both active and inactive states.
+    This includes dimensions, border styling, text rendering settings, and color definitions for
+    both active and inactive states.
     """
 
     # Text and font settings.
@@ -41,12 +40,11 @@ class ButtonConfig:
 
 @dataclass(frozen=True)
 class GUIPanelConfig:
-    """
-    Configuration container for GUI panel layout and styling.
+    """Configuration container for GUI panel layout and styling.
 
-    Defines the default geometry, spacing, alignment, and visual appearance
-    of a GUIPanel instance. Controls how the panel is positioned within the
-    main surface and how child UI elements are spaced and aligned inside it.
+    Defines the default geometry, spacing, alignment, and visual appearance of a GUIPanel
+    instance. Controls how the panel is positioned within the main surface and how child UI elements
+    are spaced and aligned inside it.
     """
 
     # Size and distance settings.
@@ -65,12 +63,11 @@ class GUIPanelConfig:
 
 @dataclass(frozen=True)
 class PGPlonkerConfig:
-    """
-    Root configuration object for the pg_plonker UI system.
+    """Root configuration object for the pg_plonker UI system.
 
-    Aggregates all sub-configurations (such as GUI panel and button settings)
-    into a single immutable configuration structure. Intended as the top-level
-    entry point for global UI styling and layout defaults.
+    Aggregates all sub-configurations (such as GUI panel and button settings) into a single
+    immutable configuration structure. Intended as the top-level entry point for global UI styling
+    and layout defaults.
     """
 
     gui_panel: GUIPanelConfig = field(default_factory=GUIPanelConfig)
