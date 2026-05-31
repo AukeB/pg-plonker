@@ -36,8 +36,8 @@ class Button:
     ) -> None:
         """Initialize a Button instance with rendering surface, position, and visual configuration.
 
-        The Button is a stateful UI element that can toggle between active and inactive states.
-        It stores its geometry and visual configuration and delegates rendering to the stateless
+        The Button is a stateful UI element that can toggle between active and inactive states. It
+        stores its geometry and visual configuration and delegates rendering to the stateless
         `draw.button` function each frame.
 
         All visual parameters are optional and fall back to defaults defined in `ButtonConfig` /

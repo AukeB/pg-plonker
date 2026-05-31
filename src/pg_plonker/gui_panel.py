@@ -71,8 +71,8 @@ class GUIPanel:
     def _translate_event_to_local(self, event: pg.event.Event) -> pg.event.Event | None:
         """Translate a screen-space pygame event into panel-local coordinates.
 
-        This function converts global mouse coordinates into the panel's local coordinate space
-        so that child controls can correctly perform hit-testing (e.g. collidepoint checks).
+        This function converts global mouse coordinates into the panel's local coordinate space so
+        that child controls can correctly perform hit- testing (e.g. collidepoint checks).
 
         Events occurring outside the panel bounds are ignored and return None.
 
@@ -126,9 +126,9 @@ class GUIPanel:
         coordinate space. Its final position is determined by the panel's layout system (vertical
         stacking with centering).
 
-        The panel: - Instantiates the button with default or overridden styling - Assigns a
-        computed x/y position based on layout rules - Updates internal layout cursor for subsequent
-        controls - Registers the button for event handling and rendering
+        The panel: - Instantiates the button with default or overridden styling - Assigns a computed
+        x/y position based on layout rules - Updates internal layout cursor for subsequent controls
+        - Registers the button for event handling and rendering
 
         Args:
             width (int | None): Button width in pixels.
@@ -218,8 +218,8 @@ class GUIPanel:
     def draw(self) -> None:
         """Render the GUI panel and all contained controls.
 
-        This includes: - Filling the panel background - Drawing all registered controls -
-        Rendering the vertical divider line separating the panel from the main surface
+        This includes: - Filling the panel background - Drawing all registered controls - Rendering
+        the vertical divider line separating the panel from the main surface
 
         The panel uses a subsurface to ensure all child controls render in local coordinates,
         independent of the main surface coordinate space.

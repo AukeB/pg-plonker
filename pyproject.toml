@@ -13,6 +13,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "docstring-tailor>=0.1.0",
     "prek>=0.3.8",
     "ruff>=0.11.6",
     "ty>=0.0.29",
@@ -27,6 +28,9 @@ select = [
 
 [tool.ruff.lint.isort]
 known-first-party = ["src"]
+
+[tool.docstring_tailor]
+line-length = 100
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

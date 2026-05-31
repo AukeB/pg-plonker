@@ -9,8 +9,8 @@ type RGBColor = tuple[int, int, int]
 class ButtonConfig:
     """Configuration container for visual and layout properties of a Button.
 
-    Defines all default styling, sizing, and typography parameters used by Button instances when
-    no explicit overrides are provided.
+    Defines all default styling, sizing, and typography parameters used by Button instances when no
+    explicit overrides are provided.
 
     This includes dimensions, border styling, text rendering settings, and color definitions for
     both active and inactive states.
@@ -42,9 +42,9 @@ class ButtonConfig:
 class GUIPanelConfig:
     """Configuration container for GUI panel layout and styling.
 
-    Defines the default geometry, spacing, alignment, and visual appearance of a GUIPanel
-    instance. Controls how the panel is positioned within the main surface and how child UI elements
-    are spaced and aligned inside it.
+    Defines the default geometry, spacing, alignment, and visual appearance of a GUIPanel instance.
+    Controls how the panel is positioned within the main surface and how child UI elements are
+    spaced and aligned inside it.
     """
 
     # Size and distance settings.
