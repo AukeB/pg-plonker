@@ -36,16 +36,15 @@ wheels = [
 
 [[package]]
 name = "docstring-tailor"
-version = "0.1.0"
+version = "0.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "libcst" },
-    { name = "logging" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b6/2d/7991a4d371c69226f182260eeba7b08a6f440fa0facd51785934db387d31/docstring_tailor-0.1.0.tar.gz", hash = "sha256:cf8ff192fa815934eebdc0aff1ff1ad1d0e3535971b8811106a36db5c8d45629", size = 52091, upload-time = "2026-05-31T17:34:02.702Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/98/64/5689015784a7b6eb21e957783a11448b66d277f4e09480c80b20d5ce1d1f/docstring_tailor-0.2.0.tar.gz", hash = "sha256:3e556804b3196b54b3a78472f2c50f0753d5db6acd59e3834351fab8346ee420", size = 58590, upload-time = "2026-06-07T16:03:33.759Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a8/cc/3b6befaeb7fbb291ec8e16616cf9e2353678893881228311d7fe7b992d6c/docstring_tailor-0.1.0-py3-none-any.whl", hash = "sha256:29977e51b48cf73177a7584b60722abf491d062a8c45cdf5190a9ffb88e4d031", size = 17919, upload-time = "2026-05-31T17:34:01.355Z" },
+    { url = "https://files.pythonhosted.org/packages/81/6c/6b41170f7c085a58b6a1799fe1f84df6bc28a13d295a728c879db1b4d0e3/docstring_tailor-0.2.0-py3-none-any.whl", hash = "sha256:2c3c0a9bd204a8b5533817da904d0bd48a3a306cc7ec86e22091330218335d6c", size = 21575, upload-time = "2026-06-07T16:03:32.239Z" },
 ]
 
 [[package]]
@@ -156,7 +155,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "docstring-tailor", specifier = ">=0.1.0" },
+    { name = "docstring-tailor", specifier = ">=0.2.0" },
     { name = "prek", specifier = ">=0.3.8" },
     { name = "ruff", specifier = ">=0.11.6" },
     { name = "ty", specifier = ">=0.0.29" },

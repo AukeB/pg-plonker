@@ -25,14 +25,15 @@ class GUIPanel:
     ) -> None:
         """Initialize a GUIPanel instance attached to a pygame surface.
 
-        The GUIPanel represents a vertical UI container responsible for: - Defining a dedicated
-        panel region within the main surface - Managing layout of child UI controls - Forwarding
-        events to registered controls with coordinate translation - Rendering the panel background,
-        divider, and all child controls
+        The GUIPanel represents a vertical UI container responsible for:
+        - Defining a dedicated panel region within the main surface
+        - Managing layout of child UI controls
+        - Forwarding events to registered controls with coordinate translation
+        - Rendering the panel background, divider, and all child controls
 
-        Layout is computed immediately based on the provided surface size and alignment settings.
-        The panel creates a subsurface to provide a local drawing coordinate space for contained
-        controls.
+        Layout is computed immediately based on the provided surface size and alignment
+        settings. The panel creates a subsurface to provide a local drawing coordinate
+        space for contained controls.
 
         All configuration parameters are optional and fall back to values defined in
         `GUIPanelConfig` when not provided.
@@ -71,8 +72,9 @@ class GUIPanel:
     def _translate_event_to_local(self, event: pg.event.Event) -> pg.event.Event | None:
         """Translate a screen-space pygame event into panel-local coordinates.
 
-        This function converts global mouse coordinates into the panel's local coordinate space so
-        that child controls can correctly perform hit- testing (e.g. collidepoint checks).
+        This function converts global mouse coordinates into the panel's local
+        coordinate space so that child controls can correctly perform hit- testing (e.g.
+        collidepoint checks).
 
         Events occurring outside the panel bounds are ignored and return None.
 
@@ -80,8 +82,8 @@ class GUIPanel:
             event (pg.event.Event): A pygame event from the main event loop.
 
         Returns:
-            pg.event.Event | None: A new event with translated coordinates if applicable, otherwise
-                None if the event is outside the panel.
+            pg.event.Event | None: A new event with translated coordinates if
+                applicable, otherwise None if the event is outside the panel.
         """
         if not hasattr(event, "pos"):
             return event
@@ -122,12 +124,14 @@ class GUIPanel:
     ) -> Button:
         """Create a Button, register it with the panel, and assign automatic layout.
 
-        The button is created using the panel's subsurface so that it operates in panel- local
-        coordinate space. Its final position is determined by the panel's layout system (vertical
-        stacking with centering).
+        The button is created using the panel's subsurface so that it operates in panel-
+        local coordinate space. Its final position is determined by the panel's layout
+        system (vertical stacking with centering).
 
-        The panel: - Instantiates the button with default or overridden styling - Assigns a computed
-        x/y position based on layout rules - Updates internal layout cursor for subsequent controls
+        The panel:
+        - Instantiates the button with default or overridden styling
+        - Assigns a computed x/y position based on layout rules
+        - Updates internal layout cursor for subsequent controls
         - Registers the button for event handling and rendering
 
         Args:
@@ -199,8 +203,9 @@ class GUIPanel:
     def handle_event(self, event: pg.event.Event) -> None:
         """Forward a pygame event to all registered panel controls.
 
-        Mouse events are first translated into panel-local coordinates before being dispatched,
-        ensuring correct hit-testing within the panel's subsurface coordinate system.
+        Mouse events are first translated into panel-local coordinates before being
+        dispatched, ensuring correct hit-testing within the panel's subsurface
+        coordinate system.
 
         Non-mouse events are ignored if they fall outside the panel region.
 
@@ -218,11 +223,13 @@ class GUIPanel:
     def draw(self) -> None:
         """Render the GUI panel and all contained controls.
 
-        This includes: - Filling the panel background - Drawing all registered controls - Rendering
-        the vertical divider line separating the panel from the main surface
+        This includes:
+        - Filling the panel background
+        - Drawing all registered controls
+        - Rendering the vertical divider line separating the panel from the main surface
 
-        The panel uses a subsurface to ensure all child controls render in local coordinates,
-        independent of the main surface coordinate space.
+        The panel uses a subsurface to ensure all child controls render in local
+        coordinates, independent of the main surface coordinate space.
         """
         self.subsurface.fill(self.color_background)
 

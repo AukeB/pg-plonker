@@ -9,7 +9,7 @@ ruff:
 
 # Docstring formatting with docstring_tailor
 docstring:
-	uv run docstring_tailor $(PROJECT_NAME)
+	uv run docstring_tailor
 	@echo "🔧 Successfully executed docstring_tailor."
 
 # Static type-check code with ty

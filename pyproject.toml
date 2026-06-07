@@ -13,7 +13,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "docstring-tailor>=0.1.0",
+    "docstring-tailor>=0.2.0",
     "prek>=0.3.8",
     "ruff>=0.11.6",
     "ty>=0.0.29",
@@ -30,8 +30,9 @@ select = [
 known-first-party = ["src"]
 
 [tool.docstring_tailor]
-line-length = 100
+line-length = 88
 style = "google"
+detect-lists = true
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
