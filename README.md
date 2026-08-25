@@ -1,8 +1,6 @@
 # pg-plonker
 
-**pg-plonker** is a lightweight pygame extension for plonking GUI elements down on your pygame window. It follows pygame's own conventions closely, so if you already know pygame, you already know most of pg-plonker.
-
-> Developed using an API-first design approach — the public interface was designed before a single line of implementation was written.
+**pg-plonker** is a lightweight pygame extension for plonking GUI elements down on your pygame window, such as buttons and sliders. It follows pygame's own conventions closely, so if you already know pygame, you already know most of pg-plonker.
 
 ---
 
@@ -46,8 +44,6 @@ while running:
 pg.quit()
 ```
 
----
-
 ## Drawing functions
 
 pg-plonker exposes a `draw` module that mirrors `pygame.draw` — stateless functions that take a surface and draw onto it. These are the lowest-level building blocks.
@@ -82,8 +78,6 @@ pgp.draw.button(
 ```
 
 `pgp.draw.button` is intentionally stateless — it draws and forgets. Use it when you want full manual control over position and appearance, or when building your own controls on top of pg-plonker.
-
----
 
 ## Controls
 
@@ -164,17 +158,3 @@ pgp.set_mode(
     config=pgp.PanelConfig(width=300, color_background=(20, 20, 20)),
 )
 ```
-
----
-
-## Design philosophy
-
-**Familiar by design.** pg-plonker follows pygame's own conventions. `pgp.draw.button` works like `pg.draw.rect`. `pgp.set_mode` works like `pg.display.set_mode`. If you know pygame, the learning curve is nearly flat.
-
-**Defaults for everything, except what should always be explicit.** You should never have to specify a color, font, or border width just to put a button on screen. The only required argument to `pgp.Button` is the label text, because that is the one thing pg-plonker cannot guess for you.
-
-**Everything is overridable.** Defaults are a starting point, not a constraint. Every visual property can be overridden at the style level, the control level, or the individual draw-call level.
-
-**Styles are complete, not cosmetic.** A style is not just a color palette — it defines the visual structure of each control. The `"embossed"` style renders inner borders that create a sense of depth; the `"flat"` style does not have inner borders at all. Each style ships with exactly the config fields it needs.
-
-**API-first.** The public interface was designed before any implementation. The question asked first was: what should working with this feel like? The answer drove every subsequent decision.
