@@ -138,15 +138,12 @@ class Button:
             color_text_shadow=self.color_text_shadow,
         )
 
-    def handle_event(self, event: pg.event.Event) -> bool:
+    def handle_event(self, event: pg.event.Event) -> None:
         """Toggle state on mouse release if the button was pressed down on this
         control.
 
         Args:
             event (pg.event.Event): The pygame event to handle.
-
-        Returns:
-            changed (bool): True if the state changed, False otherwise.
         """
         if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
             if self.rect.collidepoint(event.pos):
@@ -154,11 +151,6 @@ class Button:
 
         if event.type == pg.MOUSEBUTTONUP and event.button == 1:
             if self._pressed and self.rect.collidepoint(event.pos):
-                self._pressed = False
                 self.state = not self.state
 
-                return True
-
             self._pressed = False
-
-        return False
