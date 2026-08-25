@@ -52,13 +52,31 @@ class GUIPanel:
         """
         # Get all arguments, either from function input or config.
         self.surface = surface
-        self.width = width or _config_gui_panel.width
-        self.border_width = border_width or _config_gui_panel.border_width
-        self.margin_gui_panel = margin_gui_panel or _config_gui_panel.margin_gui_panel
-        self.margin_button = margin_button or _config_gui_panel.margin_button
-        self.align_right = align_right or _config_gui_panel.align_right
-        self.color_background = color_background or _config_gui_panel.color_background
-        self.color_border = color_border or _config_gui_panel.color_border
+        self.width = width if width is not None else _config_gui_panel.width
+        self.border_width = (
+            border_width if border_width is not None else _config_gui_panel.border_width
+        )
+        self.margin_gui_panel = (
+            margin_gui_panel
+            if margin_gui_panel is not None
+            else _config_gui_panel.margin_gui_panel
+        )
+        self.margin_button = (
+            margin_button
+            if margin_button is not None
+            else _config_gui_panel.margin_button
+        )
+        self.align_right = (
+            align_right if align_right is not None else _config_gui_panel.align_right
+        )
+        self.color_background = (
+            color_background
+            if color_background is not None
+            else _config_gui_panel.color_background
+        )
+        self.color_border = (
+            color_border if color_border is not None else _config_gui_panel.color_border
+        )
 
         # Layout of the GUI Panel.
         screen_width, screen_height = surface.get_size()

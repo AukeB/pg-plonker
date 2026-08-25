@@ -1,6 +1,6 @@
 """Module for GUI configuration for the pg_plonker package."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 type RGBColor = tuple[int, int, int]
 
@@ -58,16 +58,3 @@ class GUIPanelConfig:
     # Color settings.
     color_background: RGBColor = (230, 230, 230)
     color_border: RGBColor = (0, 0, 0)
-
-
-@dataclass(frozen=True)
-class PGPlonkerConfig:
-    """Root configuration object for the pg_plonker UI system.
-
-    Aggregates all sub-configurations (such as GUI panel and button settings)
-    into a single immutable configuration structure. Intended as the top-level
-    entry point for global UI styling and layout defaults.
-    """
-
-    gui_panel: GUIPanelConfig = field(default_factory=GUIPanelConfig)
-    button: ButtonConfig = field(default_factory=ButtonConfig)

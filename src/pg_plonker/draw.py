@@ -66,24 +66,48 @@ def button(
             if provided.
     """
     # Get all arguments, either from function input or config.
-    width = width or _config_button.width
-    height = height or _config_button.height
-    text = text or _config_button.text
-    font_name = font_name or _config_button.font_name
-    font_size = font_size or _config_button.font_size
-    border_width = border_width or _config_button.border_width
-    border_width_inner = border_width_inner or _config_button.border_width_inner
-    text_shadow_offset = text_shadow_offset or _config_button.text_shadow_offset
-    color_background = color_background or _config_button.color_background_inactive
-    color_text = color_text or _config_button.color_text
-    color_border = color_border or _config_button.color_border
+    width = width if width is not None else _config_button.width
+    height = height if height is not None else _config_button.height
+    text = text if text is not None else _config_button.text
+    font_name = font_name if font_name is not None else _config_button.font_name
+    font_size = font_size if font_size is not None else _config_button.font_size
+    border_width = (
+        border_width if border_width is not None else _config_button.border_width
+    )
+    border_width_inner = (
+        border_width_inner
+        if border_width_inner is not None
+        else _config_button.border_width_inner
+    )
+    text_shadow_offset = (
+        text_shadow_offset
+        if text_shadow_offset is not None
+        else _config_button.text_shadow_offset
+    )
+    color_background = (
+        color_background
+        if color_background is not None
+        else _config_button.color_background_inactive
+    )
+    color_text = color_text if color_text is not None else _config_button.color_text
+    color_border = (
+        color_border if color_border is not None else _config_button.color_border
+    )
     color_border_inner_light = (
-        color_border_inner_light or _config_button.color_border_inner_light
+        color_border_inner_light
+        if color_border_inner_light is not None
+        else _config_button.color_border_inner_light
     )
     color_border_inner_dark = (
-        color_border_inner_dark or _config_button.color_border_inner_dark
+        color_border_inner_dark
+        if color_border_inner_dark is not None
+        else _config_button.color_border_inner_dark
     )
-    color_text_shadow = color_text_shadow or _config_button.color_text_shadow
+    color_text_shadow = (
+        color_text_shadow
+        if color_text_shadow is not None
+        else _config_button.color_text_shadow
+    )
 
     # Definitions depending on function/config input.
     rect = pg.Rect(x, y, width, height)

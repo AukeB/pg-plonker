@@ -42,7 +42,7 @@ class Button:
         delegates rendering to the stateless `draw.button` function each frame.
 
         All visual parameters are optional and fall back to defaults defined in
-        `ButtonConfig` / `PGPlonkerConfig` when not provided.
+        `ButtonConfig` when not provided.
 
         Args:
             surface (Surface): The pygame surface the button will be drawn onto.
@@ -79,8 +79,8 @@ class Button:
         self.surface = surface
         self.x = x
         self.y = y
-        self.width = width or _config_button.width
-        self.height = height or _config_button.height
+        self.width = width if width is not None else _config_button.width
+        self.height = height if height is not None else _config_button.height
         self.text = text
         self.font_name = font_name
         self.font_size = font_size
@@ -88,10 +88,14 @@ class Button:
         self.border_width_inner = border_width_inner
         self.text_shadow_offset = text_shadow_offset
         self.color_background_active = (
-            color_background_active or _config_button.color_background_active
+            color_background_active
+            if color_background_active is not None
+            else _config_button.color_background_active
         )
         self.color_background_inactive = (
-            color_background_inactive or _config_button.color_background_inactive
+            color_background_inactive
+            if color_background_inactive is not None
+            else _config_button.color_background_inactive
         )
         self.color_text = color_text
         self.color_border = color_border
