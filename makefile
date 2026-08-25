@@ -7,12 +7,11 @@ ruff:
 	uv run ruff format $(PROJECT_NAME)
 	@echo "🔧 Successfully executed ruff."
 
-# Docstring formatting with docstring_tailor
-docstring:
-	uv run docstring_tailor
-	@echo "🔧 Successfully executed docstring_tailor."
+format-docstrings:
+	uv run docstring_tailor format
+	@echo "🔧 Successfully executed docstring-tailor."
 
-# Static type-check code with ty
+# Static type-check code with ty.
 ty:
 	uv run ty check
 	@echo "🔍 Successfully executed ty."
@@ -29,7 +28,6 @@ clean:
 	@rm -rf artifacts
 	@echo "🧹 Successfully cleaned project."
 
-
 # Commit and push everything to git
 git:
 	git add -A
@@ -40,7 +38,7 @@ git:
 # Run full workflow: format, type-check, test, clean, commit
 all:
 	make ruff
-	make docstring
+	make format-docstrings
 	make ty
 	make clean
 	make git

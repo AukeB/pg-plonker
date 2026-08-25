@@ -5,7 +5,6 @@ description = "pg-plonker is a lightweight PyGame extension for plonking GUI ele
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "logging>=0.4.9.6",
     "pydantic>=2.12.3",
     "pygame>=2.6.1",
     "pyyaml>=6.0.3",
@@ -13,8 +12,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "docstring-tailor>=0.2.0",
-    "prek>=0.3.8",
+    "docstring-tailor>=0.4.0",
     "ruff>=0.11.6",
     "ty>=0.0.29",
 ]
@@ -30,9 +28,8 @@ select = [
 known-first-party = ["src"]
 
 [tool.docstring_tailor]
-line-length = 88
+line-length = 80
 style = "google"
-detect-lists = true
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

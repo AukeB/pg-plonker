@@ -31,12 +31,12 @@ class GUIPanel:
         - Forwarding events to registered controls with coordinate translation
         - Rendering the panel background, divider, and all child controls
 
-        Layout is computed immediately based on the provided surface size and alignment
-        settings. The panel creates a subsurface to provide a local drawing coordinate
-        space for contained controls.
+        Layout is computed immediately based on the provided surface size and
+        alignment settings. The panel creates a subsurface to provide a local
+        drawing coordinate space for contained controls.
 
-        All configuration parameters are optional and fall back to values defined in
-        `GUIPanelConfig` when not provided.
+        All configuration parameters are optional and fall back to values
+        defined in `GUIPanelConfig` when not provided.
 
         Args:
             surface (Surface): The main pygame surface the panel is attached to.
@@ -44,8 +44,10 @@ class GUIPanel:
             border_width (int | None): Thickness of the divider line in pixels.
             margin_gui_panel (int | None): Top padding inside the panel.
             margin_button (int | None): Vertical spacing between controls.
-            align_right (bool | None): If True, panel is anchored to the right side.
-            color_background (RGBColor | None): Background fill color of the panel.
+            align_right (bool | None): If True, panel is anchored to the right
+                side.
+            color_background (RGBColor | None): Background fill color of the
+                panel.
             color_border (RGBColor | None): Color of the divider line.
         """
         # Get all arguments, either from function input or config.
@@ -73,8 +75,8 @@ class GUIPanel:
         """Translate a screen-space pygame event into panel-local coordinates.
 
         This function converts global mouse coordinates into the panel's local
-        coordinate space so that child controls can correctly perform hit- testing (e.g.
-        collidepoint checks).
+        coordinate space so that child controls can correctly perform hit-
+        testing (e.g. collidepoint checks).
 
         Events occurring outside the panel bounds are ignored and return None.
 
@@ -122,11 +124,12 @@ class GUIPanel:
         color_text_shadow: RGBColor | None = None,
         state: bool = False,
     ) -> Button:
-        """Create a Button, register it with the panel, and assign automatic layout.
+        """Create a Button, register it with the panel, and assign automatic
+        layout.
 
-        The button is created using the panel's subsurface so that it operates in panel-
-        local coordinate space. Its final position is determined by the panel's layout
-        system (vertical stacking with centering).
+        The button is created using the panel's subsurface so that it operates
+        in panel- local coordinate space. Its final position is determined by
+        the panel's layout system (vertical stacking with centering).
 
         The panel:
         - Instantiates the button with default or overridden styling
@@ -143,11 +146,14 @@ class GUIPanel:
             border_width (int | None): Outer border thickness.
             border_width_inner (int | None): Inner border thickness.
             text_shadow_offset (int | None): Shadow offset in pixels.
-            color_background_active (RGBColor | None): Background color when active.
-            color_background_inactive (RGBColor | None): Background color when inactive.
+            color_background_active (RGBColor | None): Background color when
+                active.
+            color_background_inactive (RGBColor | None): Background color when
+                inactive.
             color_text (RGBColor | None): Text color.
             color_border (RGBColor | None): Outer border color.
-            color_border_inner_light (RGBColor | None): Inner light border color.
+            color_border_inner_light (RGBColor | None): Inner light border
+                color.
             color_border_inner_dark (RGBColor | None): Inner dark border color.
             color_text_shadow (RGBColor | None): Text shadow color.
             state (bool): Initial toggle state of the button.
@@ -203,9 +209,9 @@ class GUIPanel:
     def handle_event(self, event: pg.event.Event) -> None:
         """Forward a pygame event to all registered panel controls.
 
-        Mouse events are first translated into panel-local coordinates before being
-        dispatched, ensuring correct hit-testing within the panel's subsurface
-        coordinate system.
+        Mouse events are first translated into panel-local coordinates before
+        being dispatched, ensuring correct hit-testing within the panel's
+        subsurface coordinate system.
 
         Non-mouse events are ignored if they fall outside the panel region.
 
@@ -226,7 +232,8 @@ class GUIPanel:
         This includes:
         - Filling the panel background
         - Drawing all registered controls
-        - Rendering the vertical divider line separating the panel from the main surface
+        - Rendering the vertical divider line separating the panel from the main
+          surface
 
         The panel uses a subsurface to ensure all child controls render in local
         coordinates, independent of the main surface coordinate space.
