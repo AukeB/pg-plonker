@@ -10,7 +10,7 @@ Planned work for pg-plonker, sorted by priority (highest first). See `README.md`
 
 - [x] Stateless `draw.button` function for manual drawing.
 - [x] Stateful `Button` control with active/inactive toggle state.
-- [x] `Button.handle_event` press/release handling, mutating `state` in place.
+- [x] `Button.handle_event` press/release handling, mutating `value` in place.
 - [x] Full styling surface on `Button`/`draw.button`: size, font, borders (outer + inner light/dark), background per state, text color, and text shadow — all independently overridable.
 
 ### Layout & panel (`GUIPanel`)
@@ -35,20 +35,20 @@ Planned work for pg-plonker, sorted by priority (highest first). See `README.md`
 ### Code quality
 
 - [x] Consistent `None`-based default fallback everywhere (`x if x is not None else default`), fixing the earlier `x or default` bug where falsy overrides (`0`, `False`) were silently ignored.
-- [x] `Button.handle_event` and `GUIPanel.handle_event` both return `None`, consistent with the "poll `.state` yourself" usage pattern.
+- [x] `Button.handle_event` and `GUIPanel.handle_event` both return `None`, consistent with the "poll `.value` yourself" usage pattern.
 
 ---
 
 ## 1. New GUI elements
 
-- [ ] Design `Slider` control API (value range, step, drag handling).
-- [ ] Implement `draw.slider` stateless drawing function.
-- [ ] Implement `Slider` class (state, `handle_event`, `draw`).
-- [ ] Add a `SliderConfig` default config model.
-- [ ] Wire `Slider` into `GUIPanel.add_slider` for automatic layout.
+- [x] Design `Slider` control API (value range, step, drag handling).
+- [x] Implement `draw.slider` stateless drawing function.
+- [x] Implement `Slider` class (value, `handle_event`, `draw`).
+- [x] Add a `SliderConfig` default config model.
+- [x] Wire `Slider` into `GUIPanel.add_slider` for automatic layout.
 - [ ] Design `Dropdown` control API (options list, selected value, open/closed state).
 - [ ] Implement `draw.dropdown` stateless drawing function.
-- [ ] Implement `Dropdown` class (state, `handle_event`, `draw`).
+- [ ] Implement `Dropdown` class (value, `handle_event`, `draw`).
 - [ ] Add a `DropdownConfig` default config model.
 - [ ] Wire `Dropdown` into `GUIPanel.add_dropdown` for automatic layout.
 

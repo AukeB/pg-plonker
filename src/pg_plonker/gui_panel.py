@@ -3,8 +3,7 @@
 import pygame as pg
 from pygame import Rect, Surface
 
-from pg_plonker.controls.button import Button
-from pg_plonker.controls.slider import Slider
+from pg_plonker.controls import Button, Slider
 from pg_plonker.gui_config_models import GUIPanelConfig, RGBColor
 
 _config_gui_panel = GUIPanelConfig()
@@ -141,7 +140,7 @@ class GUIPanel:
         color_border_inner_light: RGBColor | None = None,
         color_border_inner_dark: RGBColor | None = None,
         color_text_shadow: RGBColor | None = None,
-        state: bool = False,
+        value: bool = False,
     ) -> Button:
         """Create a Button, register it with the panel, and assign automatic
         layout.
@@ -175,7 +174,7 @@ class GUIPanel:
                 color.
             color_border_inner_dark (RGBColor | None): Inner dark border color.
             color_text_shadow (RGBColor | None): Text shadow color.
-            state (bool): Initial toggle state of the button.
+            value (bool): Initial toggle value of the button.
 
         Returns:
             Button: The created and layout-managed button instance.
@@ -201,7 +200,7 @@ class GUIPanel:
             color_border_inner_light=color_border_inner_light,
             color_border_inner_dark=color_border_inner_dark,
             color_text_shadow=color_text_shadow,
-            state=state,
+            value=value,
         )
 
         button_x = (self.width - button.rect.width) // 2

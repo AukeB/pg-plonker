@@ -46,10 +46,10 @@ while running:
 
     screen.fill((255, 255, 255))
 
-    if show_grid.state:
+    if show_grid.value:
         draw_grid()
 
-    if show_vectors.state:
+    if show_vectors.value:
         draw_vectors()
 
     panel.draw()
@@ -124,7 +124,7 @@ or via a `GUIPanel`, which handles positioning automatically (see below).
 A `Button` is the value — read its state directly:
 
 ```python
-if show_grid.state:
+if show_grid.value:
     draw_grid()
 ```
 
@@ -135,7 +135,7 @@ for event in pg.event.get():
     show_grid.handle_event(event)
 ```
 
-`Button.handle_event` mutates `state` in place and returns `None` — polling `.state` each frame is the intended pattern.
+`Button.handle_event` mutates `value` in place and returns `None` — polling `.value` each frame is the intended pattern.
 
 ---
 
