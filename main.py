@@ -2,7 +2,8 @@
 
 import pygame as pg
 
-from pg_plonker.gui_panel import GUIPanel
+#from pg_plonker.gui_panel import GUIPanel
+from pg_plonker.controls.button import Button
 from pg_plonker.utils import get_window_size_from_screen_resolution
 
 
@@ -24,12 +25,13 @@ def main() -> None:
     pg.init()
     window_size = get_window_size_from_screen_resolution()
     screen = pg.display.set_mode(window_size)
-    pg.display.set_caption("PyGame Plonker - GUIPanel Test")
+    pg.display.set_caption("PyGame Plonker Testing")
 
-    panel = GUIPanel(surface=screen)
+    #panel = GUIPanel(surface=screen)
 
-    for index in range(5):
-        panel.add_button(text=f"Button {index + 1}")
+    #for index in range(5):
+    #    panel.add_button(text=f"Button {index + 1}")
+    button = Button(surface=screen, x=100, y=100)
 
     running = True
 
@@ -40,10 +42,15 @@ def main() -> None:
             ):
                 running = False
 
-            panel.handle_event(event)
+            # panel.handle_event(event)
+            button.handle_event(event)
 
         screen.fill((255, 255, 255))
-        panel.draw()
+        # panel.draw()
+        button.draw()
+
+        if button.state:
+            print('Hoiii')
 
         pg.display.flip()
 
