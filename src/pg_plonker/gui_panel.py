@@ -4,6 +4,7 @@ import pygame as pg
 from pygame import Rect, Surface
 
 from pg_plonker.controls.button import Button
+from pg_plonker.controls.slider import Slider
 from pg_plonker.gui_config_models import GUIPanelConfig, RGBColor
 
 _config_gui_panel = GUIPanelConfig()
@@ -86,8 +87,8 @@ class GUIPanel:
         self.divider_x = panel_x if self.align_right else self.width
 
         # Controls.
-        self._controls: list[Button] = []
-        self._next_button_y = self.margin_gui_panel
+        self._controls: list[Button | Slider] = []
+        self._next_control_y = self.margin_gui_panel
 
     def _translate_event_to_local(self, event: pg.event.Event) -> pg.event.Event | None:
         """Translate a screen-space pygame event into panel-local coordinates.
@@ -204,7 +205,7 @@ class GUIPanel:
         )
 
         button_x = (self.width - button.rect.width) // 2
-        button_y = self._next_button_y
+        button_y = self._next_control_y
         button.x = button_x
         button.y = button_y
 
@@ -217,12 +218,119 @@ class GUIPanel:
         )
 
         # Advance layout cursor for next GUI element that will be placed.
-        self._next_button_y += button.rect.height + self.margin_button
+        self._next_control_y += button.rect.height + self.margin_button
 
         # Register control
         self._controls.append(button)
 
         return button
+
+    def add_slider(
+        self,
+        *,
+        start: int | float,
+        stop: int | float,
+        value: int | float | None = None,
+        step: int | float | None = None,
+        width: int | None = None,
+        height: int | None = None,
+        handle_radius: int | None = None,
+        border_width: int | None = None,
+        font_name: str | None = None,
+        font_size: int | None = None,
+        extra_decimal_places: int | None = None,
+        show_value: bool = False,
+        color_track: RGBColor | None = None,
+        color_track_filled: RGBColor | None = None,
+        color_handle: RGBColor | None = None,
+        color_border: RGBColor | None = None,
+        color_text: RGBColor | None = None,
+    ) -> Slider:
+        """Create a Slider, register it with the panel, and assign automatic
+        layout.
+
+        The slider is created using the panel's subsurface so that it operates
+        in panel-local coordinate space. Its final position is determined by the
+        panel's layout system (vertical stacking with centering).
+
+        The panel:
+        - Instantiates the slider with default or overridden styling
+        - Assigns a computed x/y position based on layout rules
+        - Updates internal layout cursor for subsequent controls
+        - Registers the slider for event handling and rendering
+
+        Args:
+            start (int | float): The minimum value of the slider's range.
+            stop (int | float): The maximum value of the slider's range.
+            value (int | float | None): Initial value, defaults to start if
+                None.
+            step (int | float | None): Increment the value snaps to when
+                dragging. If None, the value is continuous.
+            width (int | None): Track width in pixels.
+            height (int | None): Track height in pixels.
+            handle_radius (int | None): Handle circle radius in pixels.
+            border_width (int | None): Handle border thickness in pixels.
+            font_name (str | None): Font family used for the value readout.
+            font_size (int | None): Font size in points.
+            extra_decimal_places (int | None): Number of decimal places added on
+                top of the precision already implied by start/stop.
+            show_value (bool): Whether to render the current value above the
+                handle.
+            color_track (RGBColor | None): Track fill color.
+            color_track_filled (RGBColor | None): Filled portion color.
+            color_handle (RGBColor | None): Handle fill color.
+            color_border (RGBColor | None): Handle border color.
+            color_text (RGBColor | None): Value readout text color.
+
+        Returns:
+            Slider: The created and layout-managed slider instance.
+        """
+        # Create a slider. Use 0 for x and y position value. These values will
+        # get overwritten because the slider will get a predefined place in
+        # the UI-panel.
+        slider = Slider(
+            surface=self.subsurface,
+            x=0,
+            y=0,
+            start=start,
+            stop=stop,
+            value=value,
+            step=step,
+            width=width,
+            height=height,
+            handle_radius=handle_radius,
+            border_width=border_width,
+            font_name=font_name,
+            font_size=font_size,
+            extra_decimal_places=extra_decimal_places,
+            show_value=show_value,
+            color_track=color_track,
+            color_track_filled=color_track_filled,
+            color_handle=color_handle,
+            color_border=color_border,
+            color_text=color_text,
+        )
+
+        slider_x = (self.width - slider.rect.width) // 2
+        slider_y = self._next_control_y + slider.rect.height // 2
+        slider.x = slider_x
+        slider.y = slider_y
+
+        # Assign final position (panel-local coords)
+        slider.rect = pg.Rect(
+            slider_x,
+            slider_y - slider.rect.height // 2,
+            slider.rect.width,
+            slider.rect.height,
+        )
+
+        # Advance layout cursor for next GUI element that will be placed.
+        self._next_control_y += slider.rect.height + self.margin_button
+
+        # Register control
+        self._controls.append(slider)
+
+        return slider
 
     def handle_event(self, event: pg.event.Event) -> None:
         """Forward a pygame event to all registered panel controls.
