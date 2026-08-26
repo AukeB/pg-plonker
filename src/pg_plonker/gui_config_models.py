@@ -38,6 +38,39 @@ class ButtonConfig:
 
 
 @dataclass(frozen=True)
+class SliderConfig:
+    """Configuration container for visual and layout properties of a Slider.
+
+    Defines all default styling, sizing, and typography parameters used by
+    Slider instances when no explicit overrides are provided. This includes
+    track and handle dimensions, precision settings for the displayed value, and
+    color definitions for the track, handle, border, and value readout.
+    """
+
+    # Text and font settings.
+    font_name: str = "arial"
+    font_size: int = 28
+
+    # Size and distance settings.
+    width: int = 540
+    height: int = 12
+    handle_radius: int = 16
+    border_width: int = 3
+
+    # Number of decimal places added on top of the precision already implied
+    # by `start`/`stop`, to keep displayed and dragged values readable while
+    # avoiding floating-point noise.
+    extra_decimal_places: int = 2
+
+    # Color settings.
+    color_track: RGBColor = (150, 150, 150)
+    color_track_filled: RGBColor = (200, 150, 150)
+    color_handle: RGBColor = (230, 230, 230)
+    color_border: RGBColor = (0, 0, 0)
+    color_text: RGBColor = (0, 0, 0)
+
+
+@dataclass(frozen=True)
 class GUIPanelConfig:
     """Configuration container for GUI panel layout and styling.
 

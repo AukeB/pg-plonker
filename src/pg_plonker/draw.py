@@ -3,10 +3,11 @@
 import pygame as pg
 from pygame import Surface
 
-from pg_plonker.gui_config_models import ButtonConfig, RGBColor
+from pg_plonker.gui_config_models import ButtonConfig, RGBColor, SliderConfig
 from pg_plonker.utils import get_font
 
 _config_button = ButtonConfig()
+_config_slider = SliderConfig()
 
 
 def button(
@@ -159,3 +160,110 @@ def button(
     text_surface = font.render(text, True, color_text)
     text_rect = text_surface.get_rect(center=rect.center)
     surface.blit(text_surface, text_rect)
+
+
+def slider(
+    surface: Surface,
+    x: int,
+    y: int,
+    start: int | float,
+    stop: int | float,
+    value: int | float,
+    precision: int,
+    width: int | None = None,
+    height: int | None = None,
+    handle_radius: int | None = None,
+    border_width: int | None = None,
+    font_name: str | None = None,
+    font_size: int | None = None,
+    show_value: bool = False,
+    color_track: RGBColor | None = None,
+    color_track_filled: RGBColor | None = None,
+    color_handle: RGBColor | None = None,
+    color_border: RGBColor | None = None,
+    color_text: RGBColor | None = None,
+) -> None:
+    """Draw a single horizontal slider onto the given surface.
+
+    All parameters except surface, x, y, start, stop, value, and precision are
+    optional and fall back to the values defined in the module-level
+    SliderConfig when not provided. This allows quick usage with minimal
+    arguments while still permitting per-call overrides of any visual property.
+
+    Args:
+        surface (Surface): The pygame surface to draw onto.
+        x (int): X position of the track's left edge, in pixels.
+        y (int): Y position of the track's vertical center, in pixels.
+        start (int | float): The minimum value of the slider's range.
+        stop (int | float): The maximum value of the slider's range.
+        value (int | float): The current value, used to position the handle.
+        precision (int): Number of decimal places to display when show_value is
+            True.
+        width (int | None): Track width in pixels, overrides config if provided.
+        height (int | None): Track height in pixels, overrides config if
+            provided.
+        handle_radius (int | None): Handle circle radius in pixels, overrides
+            config if provided.
+        border_width (int | None): Handle border thickness in pixels, overrides
+            config if provided.
+        font_name (str | None): System font name for the value readout,
+            overrides config if provided.
+        font_size (int | None): Font size in points for the value readout,
+            overrides config if provided.
+        show_value (bool): Whether to render the current value above the handle.
+        color_track (RGBColor | None): Track fill color, overrides config if
+            provided.
+        color_track_filled (RGBColor | None): Color of the filled portion of the
+            track to the left of the handle, overrides config if provided.
+        color_handle (RGBColor | None): Handle fill color, overrides config if
+            provided.
+        color_border (RGBColor | None): Handle border color, overrides config if
+            provided.
+        color_text (RGBColor | None): Value readout text color, overrides config
+            if provided.
+    """
+    # Get all arguments, either from function input or config.
+    width = width if width is not None else _config_slider.width
+    height = height if height is not None else _config_slider.height
+    handle_radius = (
+        handle_radius if handle_radius is not None else _config_slider.handle_radius
+    )
+    border_width = (
+        border_width if border_width is not None else _config_slider.border_width
+    )
+    font_name = font_name if font_name is not None else _config_slider.font_name
+    font_size = font_size if font_size is not None else _config_slider.font_size
+    color_track = color_track if color_track is not None else _config_slider.color_track
+    color_track_filled = (
+        color_track_filled
+        if color_track_filled is not None
+        else _config_slider.color_track_filled
+    )
+    color_handle = (
+        color_handle if color_handle is not None else _config_slider.color_handle
+    )
+    color_border = (
+        color_border if color_border is not None else _config_slider.color_border
+    )
+    color_text = color_text if color_text is not None else _config_slider.color_text
+
+    # Definitions depending on function/config input.
+    fraction = (value - start) / (stop - start)
+    handle_x = x + int(fraction * width)
+    handle_center = (handle_x, y)
+    track_rect = pg.Rect(x, y - height // 2, width, height)
+    track_filled_rect = pg.Rect(x, y - height // 2, handle_x - x, height)
+
+    # Drawing operations.
+    pg.draw.rect(surface, color_track, track_rect)
+    pg.draw.rect(surface, color_track_filled, track_filled_rect)
+    pg.draw.circle(surface, color_handle, handle_center, handle_radius)
+    pg.draw.circle(surface, color_border, handle_center, handle_radius, border_width)
+
+    if show_value:
+        font = get_font(font_name=font_name, font_size=font_size)
+        text_surface = font.render(f"{value:.{precision}f}", True, color_text)
+        text_rect = text_surface.get_rect(
+            midbottom=(handle_center[0], handle_center[1] - handle_radius - 4)
+        )
+        surface.blit(text_surface, text_rect)

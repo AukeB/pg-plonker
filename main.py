@@ -4,6 +4,7 @@ import pygame as pg
 
 #from pg_plonker.gui_panel import GUIPanel
 from pg_plonker.controls.button import Button
+from pg_plonker.controls.slider import Slider
 from pg_plonker.utils import get_window_size_from_screen_resolution
 
 
@@ -32,6 +33,7 @@ def main() -> None:
     #for index in range(5):
     #    panel.add_button(text=f"Button {index + 1}")
     button = Button(surface=screen, x=100, y=100)
+    slider = Slider(surface=screen, x=100, y=300, start=0, stop=10, show_value=True)
 
     running = True
 
@@ -44,13 +46,14 @@ def main() -> None:
 
             # panel.handle_event(event)
             button.handle_event(event)
+            slider.handle_event(event)
 
         screen.fill((255, 255, 255))
         # panel.draw()
         button.draw()
+        slider.draw()
 
-        if button.state:
-            print('Hoiii')
+        print(slider.value)
 
         pg.display.flip()
 

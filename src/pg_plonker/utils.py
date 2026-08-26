@@ -1,32 +1,12 @@
 """Utility module with helper functions."""
 
+from decimal import Decimal
+
 import pygame as pg
 
 from pg_plonker.constants import WINDOW_SIZE_SCREEN_FRACTION
 
 _font_cache: dict[tuple[str, int], pg.font.Font] = {}
-
-
-def get_font(font_name: str, font_size: int) -> pg.font.Font:
-    """Retrieve a font from cache, creating and caching it if not yet loaded.
-
-    pg.font.SysFont is expensive to call and should never be invoked every
-    frame. This function ensures each unique (font_name, font_size) combination
-    is created only once and reused for all subsequent calls.
-
-    Args:
-        font_name (str): The system font name to load.
-        font_size (int): The font size in points.
-
-    Returns:
-        font (pg.font.Font): The cached font object.
-    """
-    key = (font_name, font_size)
-    if key not in _font_cache:
-        _font_cache[key] = pg.font.SysFont(name=font_name, size=font_size)
-    result = _font_cache[key]
-
-    return result
 
 
 def get_window_size_from_screen_resolution(
@@ -69,3 +49,46 @@ def get_window_size_from_screen_resolution(
     height = max(min_height, int(desktop_height * WINDOW_SIZE_SCREEN_FRACTION))
 
     return width, height
+
+
+def get_font(font_name: str, font_size: int) -> pg.font.Font:
+    """Retrieve a font from cache, creating and caching it if not yet loaded.
+
+    pg.font.SysFont is expensive to call and should never be invoked every
+    frame. This function ensures each unique (font_name, font_size) combination
+    is created only once and reused for all subsequent calls.
+
+    Args:
+        font_name (str): The system font name to load.
+        font_size (int): The font size in points.
+
+    Returns:
+        font (pg.font.Font): The cached font object.
+    """
+    key = (font_name, font_size)
+    if key not in _font_cache:
+        _font_cache[key] = pg.font.SysFont(name=font_name, size=font_size)
+    result = _font_cache[key]
+
+    return result
+
+
+def count_decimal_places(value: int | float) -> int:
+    """Count the number of decimal digits in a number's shortest string form.
+
+    Counting is done via Decimal(str(value)) rather than inspecting the raw
+    float directly, since binary floating-point numbers do not store decimal
+    values exactly (e.g. 0.05 is not represented exactly as 0.05 in memory).
+    Going through str() first yields Python's shortest round-trip
+    representation, i.e. the digits a human would have actually typed.
+
+    Args:
+        value (int | float): The number to inspect.
+
+    Returns:
+        decimal_places (int): The number of digits after the decimal point.
+    """
+    exponent = Decimal(str(value)).as_tuple().exponent
+    decimal_places = max(-exponent, 0) if isinstance(exponent, int) else 0
+
+    return decimal_places
