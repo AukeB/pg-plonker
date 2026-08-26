@@ -3,7 +3,7 @@
 import pygame as pg
 
 from pg_plonker.gui_panel import GUIPanel
-from pg_plonker.controls import Button, Slider
+from pg_plonker.controls import Button, Slider, Dropdown
 from pg_plonker.utils import get_window_size_from_screen_resolution
 
 
@@ -31,6 +31,11 @@ def main() -> None:
 
     button = panel.add_button()
     slider = panel.add_slider(start=0, stop=10)
+    dropdown = panel.add_dropdown(options=[
+        "Level 0",
+        "Level 1",
+        "Level 2"
+    ])
 
     #button = Button(surface=screen, x=100, y=100)
     #slider = Slider(surface=screen, x=100, y=300, start=0, stop=10, show_value=True)
@@ -55,6 +60,8 @@ def main() -> None:
 
         print(f"{button.value}")
         print(f"{slider.value}")
+        print(f"{dropdown.value}")
+        print()
 
         
 

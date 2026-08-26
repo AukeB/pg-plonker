@@ -3,7 +3,7 @@
 import pygame as pg
 from pygame import Rect, Surface
 
-from pg_plonker.controls import Button, Slider
+from pg_plonker.controls import Button, Dropdown, Slider
 from pg_plonker.gui_config_models import GUIPanelConfig, RGBColor
 
 _config_gui_panel = GUIPanelConfig()
@@ -86,7 +86,7 @@ class GUIPanel:
         self.divider_x = panel_x if self.align_right else self.width
 
         # Controls.
-        self._controls: list[Button | Slider] = []
+        self._controls: list[Button | Slider | Dropdown] = []
         self._next_control_y = self.margin_gui_panel
 
     def _translate_event_to_local(self, event: pg.event.Event) -> pg.event.Event | None:
@@ -235,6 +235,7 @@ class GUIPanel:
         height: int | None = None,
         handle_radius: int | None = None,
         border_width: int | None = None,
+        margin_vertical: int | None = None,
         font_name: str | None = None,
         font_size: int | None = None,
         extra_decimal_places: int | None = None,
@@ -269,6 +270,8 @@ class GUIPanel:
             height (int | None): Track height in pixels.
             handle_radius (int | None): Handle circle radius in pixels.
             border_width (int | None): Handle border thickness in pixels.
+            margin_vertical (int | None): Vertical spacing reserved above and
+                below the slider track, separating it from neighboring controls.
             font_name (str | None): Font family used for the value readout.
             font_size (int | None): Font size in points.
             extra_decimal_places (int | None): Number of decimal places added on
@@ -299,6 +302,7 @@ class GUIPanel:
             height=height,
             handle_radius=handle_radius,
             border_width=border_width,
+            margin_vertical=margin_vertical,
             font_name=font_name,
             font_size=font_size,
             extra_decimal_places=extra_decimal_places,
@@ -311,7 +315,9 @@ class GUIPanel:
         )
 
         slider_x = (self.width - slider.rect.width) // 2
-        slider_y = self._next_control_y + slider.rect.height // 2
+        slider_y = (
+            self._next_control_y + slider.margin_vertical + slider.rect.height // 2
+        )
         slider.x = slider_x
         slider.y = slider_y
 
@@ -323,13 +329,144 @@ class GUIPanel:
             slider.rect.height,
         )
 
-        # Advance layout cursor for next GUI element that will be placed.
-        self._next_control_y += slider.rect.height + self.margin_button
+        # Advance layout cursor for next GUI element that will be placed. The
+        # slider reserves margin_vertical spacing both above and below its
+        # track, on top of the panel's regular margin_button spacing, since
+        # its track height is small relative to other controls.
+        self._next_control_y += (
+            slider.margin_vertical * 2 + slider.rect.height + self.margin_button
+        )
 
         # Register control
         self._controls.append(slider)
 
         return slider
+
+    def add_dropdown(
+        self,
+        *,
+        options: list[str],
+        value: str | None = None,
+        width: int | None = None,
+        height: int | None = None,
+        option_height: int | None = None,
+        font_name: str | None = None,
+        font_size: int | None = None,
+        border_width: int | None = None,
+        border_width_inner: int | None = None,
+        text_shadow_offset: int | None = None,
+        arrow_size: int | None = None,
+        color_background_active: RGBColor | None = None,
+        color_background_inactive: RGBColor | None = None,
+        color_background_option: RGBColor | None = None,
+        color_background_option_hover: RGBColor | None = None,
+        color_text: RGBColor | None = None,
+        color_border: RGBColor | None = None,
+        color_border_inner_light: RGBColor | None = None,
+        color_border_inner_dark: RGBColor | None = None,
+        color_text_shadow: RGBColor | None = None,
+        color_arrow: RGBColor | None = None,
+    ) -> Dropdown:
+        """Create a Dropdown, register it with the panel, and assign automatic
+        layout.
+
+        The dropdown is created using the panel's subsurface so that it operates
+        in panel-local coordinate space. Its final position is determined by the
+        panel's layout system (vertical stacking with centering). Only the
+        closed header's height is reserved in the layout, since the open option
+        list overlays other controls instead of displacing them.
+
+        The panel:
+        - Instantiates the dropdown with default or overridden styling
+        - Assigns a computed x/y position based on layout rules
+        - Updates internal layout cursor for subsequent controls
+        - Registers the dropdown for event handling and rendering
+
+        Args:
+            options (list[str]): The selectable option labels, in display order.
+            value (str | None): Initial selected value, defaults to the first
+                option if None.
+            width (int | None): Header/option width in pixels.
+            height (int | None): Header height in pixels.
+            option_height (int | None): Height of each option row in pixels.
+            font_name (str | None): Font family used for rendering text.
+            font_size (int | None): Font size in points.
+            border_width (int | None): Outer border thickness.
+            border_width_inner (int | None): Inner border thickness.
+            text_shadow_offset (int | None): Shadow offset in pixels.
+            arrow_size (int | None): Half-width/height of the arrow indicator.
+            color_background_active (RGBColor | None): Header background color
+                while open.
+            color_background_inactive (RGBColor | None): Header background color
+                while closed.
+            color_background_option (RGBColor | None): Default option row
+                background color.
+            color_background_option_hover (RGBColor | None): Hovered option row
+                background color.
+            color_text (RGBColor | None): Header and option text color.
+            color_border (RGBColor | None): Outer/option border color.
+            color_border_inner_light (RGBColor | None): Inner light border
+                color.
+            color_border_inner_dark (RGBColor | None): Inner dark border color.
+            color_text_shadow (RGBColor | None): Header text shadow color.
+            color_arrow (RGBColor | None): Arrow indicator color.
+
+        Returns:
+            Dropdown: The created and layout-managed dropdown instance.
+        """
+        # Create a dropdown. Use 0 for x and y position value. These values
+        # will get overwritten because the dropdown will get a predefined
+        # place in the UI-panel.
+        dropdown = Dropdown(
+            surface=self.subsurface,
+            x=0,
+            y=0,
+            options=options,
+            value=value,
+            width=width,
+            height=height,
+            option_height=option_height,
+            font_name=font_name,
+            font_size=font_size,
+            border_width=border_width,
+            border_width_inner=border_width_inner,
+            text_shadow_offset=text_shadow_offset,
+            arrow_size=arrow_size,
+            color_background_active=color_background_active,
+            color_background_inactive=color_background_inactive,
+            color_background_option=color_background_option,
+            color_background_option_hover=color_background_option_hover,
+            color_text=color_text,
+            color_border=color_border,
+            color_border_inner_light=color_border_inner_light,
+            color_border_inner_dark=color_border_inner_dark,
+            color_text_shadow=color_text_shadow,
+            color_arrow=color_arrow,
+        )
+
+        dropdown_x = (self.width - dropdown.rect.width) // 2
+        dropdown_y = self._next_control_y
+        dropdown.x = dropdown_x
+        dropdown.y = dropdown_y
+
+        # Assign final position (panel-local coords)
+        dropdown.rect = pg.Rect(
+            dropdown_x,
+            dropdown_y,
+            dropdown.rect.width,
+            dropdown.rect.height,
+        )
+
+        # Advance layout cursor for next GUI element that will be placed. Only
+        # the closed header's height is reserved: the open option list
+        # overlays other controls (layout stays stable) rather than pushing
+        # them down.
+        self._next_control_y += dropdown.rect.height + self.margin_button
+
+        # Register control
+        self._controls.append(dropdown)
+
+        return dropdown
 
     def handle_event(self, event: pg.event.Event) -> None:
         """Forward a pygame event to all registered panel controls.
@@ -340,12 +477,38 @@ class GUIPanel:
 
         Non-mouse events are ignored if they fall outside the panel region.
 
+        While a Dropdown's option list is open, it visually overlays the other
+        controls, so it also takes exclusive ownership of events: other controls
+        are not forwarded events until it closes again, preventing clicks on the
+        option list from leaking through to whatever it's covering. A click
+        outside the panel entirely still closes an open dropdown, matching
+        "clicking anywhere outside it" closing the list.
+
         Args:
             event (pg.event.Event): Event from the pygame event queue.
         """
+        open_dropdown = next(
+            (
+                control
+                for control in self._controls
+                if isinstance(control, Dropdown) and control.is_open
+            ),
+            None,
+        )
+
         translated = self._translate_event_to_local(event)
 
         if translated is None:
+            if (
+                open_dropdown is not None
+                and event.type == pg.MOUSEBUTTONDOWN
+                and event.button == 1
+            ):
+                open_dropdown.close()
+            return
+
+        if open_dropdown is not None:
+            open_dropdown.handle_event(translated)
             return
 
         for control in self._controls:
@@ -362,11 +525,18 @@ class GUIPanel:
 
         The panel uses a subsurface to ensure all child controls render in local
         coordinates, independent of the main surface coordinate space.
+
+        Any open Dropdown's option list is drawn in a second pass, after all
+        other controls, so it overlays them instead of being drawn beneath.
         """
         self.subsurface.fill(self.color_background)
 
         for control in self._controls:
             control.draw()
+
+        for control in self._controls:
+            if isinstance(control, Dropdown):
+                control.draw_options()
 
         pg.draw.line(
             self.surface,

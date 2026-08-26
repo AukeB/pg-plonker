@@ -4,11 +4,17 @@ import pygame as pg
 from pygame import Surface
 
 from pg_plonker import draw
-from pg_plonker.gui_config_models import ButtonConfig, RGBColor, SliderConfig
+from pg_plonker.gui_config_models import (
+    ButtonConfig,
+    DropdownConfig,
+    RGBColor,
+    SliderConfig,
+)
 from pg_plonker.utils import count_decimal_places
 
 _config_button = ButtonConfig()
 _config_slider = SliderConfig()
+_config_dropdown = DropdownConfig()
 
 
 class Button:
@@ -174,6 +180,7 @@ class Slider:
         height: int | None = None,
         handle_radius: int | None = None,
         border_width: int | None = None,
+        margin_vertical: int | None = None,
         font_name: str | None = None,
         font_size: int | None = None,
         extra_decimal_places: int | None = None,
@@ -214,6 +221,9 @@ class Slider:
                 value if None.
             handle_radius (int | None): Handle circle radius in pixels.
             border_width (int | None): Handle border thickness in pixels.
+            margin_vertical (int | None): Vertical spacing reserved above and
+                below the slider track when laid out in a GUIPanel, defaults to
+                config value if None.
             font_name (str | None): System font name used for the value readout.
             font_size (int | None): Font size in points for the value readout.
             extra_decimal_places (int | None): Number of decimal places added on
@@ -251,6 +261,11 @@ class Slider:
         )
         self.border_width = (
             border_width if border_width is not None else _config_slider.border_width
+        )
+        self.margin_vertical = (
+            margin_vertical
+            if margin_vertical is not None
+            else _config_slider.margin_vertical
         )
         self.font_name = font_name
         self.font_size = font_size
@@ -375,3 +390,274 @@ class Slider:
 
         if event.type == pg.MOUSEBUTTONUP and event.button == 1:
             self._dragging = False
+
+
+class Dropdown:
+    """A stateful dropdown/select control that delegates rendering to
+    draw.dropdown_header and draw.dropdown_options.
+    """
+
+    def __init__(
+        self,
+        surface: Surface,
+        x: int,
+        y: int,
+        options: list[str],
+        value: str | None = None,
+        width: int | None = None,
+        height: int | None = None,
+        option_height: int | None = None,
+        font_name: str | None = None,
+        font_size: int | None = None,
+        border_width: int | None = None,
+        border_width_inner: int | None = None,
+        text_shadow_offset: int | None = None,
+        arrow_size: int | None = None,
+        color_background_active: RGBColor | None = None,
+        color_background_inactive: RGBColor | None = None,
+        color_background_option: RGBColor | None = None,
+        color_background_option_hover: RGBColor | None = None,
+        color_text: RGBColor | None = None,
+        color_border: RGBColor | None = None,
+        color_border_inner_light: RGBColor | None = None,
+        color_border_inner_dark: RGBColor | None = None,
+        color_text_shadow: RGBColor | None = None,
+        color_arrow: RGBColor | None = None,
+    ) -> None:
+        """Initialize a Dropdown instance with rendering surface, position,
+        options, and visual configuration.
+
+        The Dropdown is a stateful UI element that holds a selected value from a
+        fixed list of options. While closed, only the header is drawn and
+        interactive. While open, the option list is meant to be drawn last (via
+        `draw_options`) so it overlays other controls rather than pushing them
+        down, and it captures clicks exclusively until it closes again.
+
+        All visual parameters are optional and fall back to defaults defined in
+        `DropdownConfig` when not provided.
+
+        Args:
+            surface (Surface): The pygame surface the dropdown will be drawn
+                onto.
+            x (int): X-position of the header in pixels (screen or panel-local
+                space).
+            y (int): Y-position of the header in pixels (screen or panel-local
+                space).
+            options (list[str]): The selectable option labels, in display order.
+            value (str | None): Initial selected value, defaults to the first
+                option if None.
+            width (int | None): Header/option width in pixels, defaults to
+                config value if None.
+            height (int | None): Header height in pixels, defaults to config
+                value if None.
+            option_height (int | None): Height of each option row in pixels,
+                defaults to config value if None.
+            font_name (str | None): System font name used for rendering text.
+            font_size (int | None): Font size in points for header/option text.
+            border_width (int | None): Outer border thickness in pixels.
+            border_width_inner (int | None): Inner border thickness in pixels.
+            text_shadow_offset (int | None): Pixel offset used for the header's
+                text shadow rendering.
+            arrow_size (int | None): Half-width/height of the arrow indicator in
+                pixels.
+            color_background_active (RGBColor | None): Header background color
+                while open.
+            color_background_inactive (RGBColor | None): Header background color
+                while closed.
+            color_background_option (RGBColor | None): Default option row
+                background color.
+            color_background_option_hover (RGBColor | None): Hovered option row
+                background color.
+            color_text (RGBColor | None): Color of the header and option text.
+            color_border (RGBColor | None): Outer/option border color.
+            color_border_inner_light (RGBColor | None): Light inner border
+                highlight color.
+            color_border_inner_dark (RGBColor | None): Dark inner border shadow
+                color.
+            color_text_shadow (RGBColor | None): Color of the header's text
+                shadow.
+            color_arrow (RGBColor | None): Arrow indicator color.
+
+        Raises:
+            ValueError: If options is empty, or if value is provided but is not
+                one of options.
+        """
+        if not options:
+            raise ValueError("options must not be empty.")
+
+        if value is not None and value not in options:
+            raise ValueError(f"value ({value!r}) must be one of {options}.")
+
+        # Display.
+        self.surface = surface
+        self.x = x
+        self.y = y
+        self.options = options
+        self.width = width if width is not None else _config_dropdown.width
+        self.height = height if height is not None else _config_dropdown.height
+        self.option_height = (
+            option_height
+            if option_height is not None
+            else _config_dropdown.option_height
+        )
+        self.font_name = font_name
+        self.font_size = font_size
+        self.border_width = border_width
+        self.border_width_inner = border_width_inner
+        self.text_shadow_offset = text_shadow_offset
+        self.arrow_size = arrow_size
+        self.color_background_active = (
+            color_background_active
+            if color_background_active is not None
+            else _config_dropdown.color_background_active
+        )
+        self.color_background_inactive = (
+            color_background_inactive
+            if color_background_inactive is not None
+            else _config_dropdown.color_background_inactive
+        )
+        self.color_background_option = color_background_option
+        self.color_background_option_hover = color_background_option_hover
+        self.color_text = color_text
+        self.color_border = color_border
+        self.color_border_inner_light = color_border_inner_light
+        self.color_border_inner_dark = color_border_inner_dark
+        self.color_text_shadow = color_text_shadow
+        self.color_arrow = color_arrow
+
+        # Definitions depending on function/config input.
+        self.rect = pg.Rect(self.x, self.y, self.width, self.height)
+
+        # State.
+        self.value = value if value is not None else self.options[0]
+        self.is_open = False
+        self._pressed = False
+        self._hovered_index: int | None = None
+
+    def _get_options_rect(self) -> pg.Rect:
+        """Compute the bounding rect of the open option list.
+
+        Returns:
+            options_rect (pg.Rect): The rect covering all option rows, stacked
+                directly below the header.
+        """
+        return pg.Rect(
+            self.rect.x,
+            self.rect.bottom,
+            self.rect.width,
+            self.option_height * len(self.options),
+        )
+
+    def close(self) -> None:
+        """Close the option list without changing the selected value.
+
+        Safe to call whether or not the dropdown is currently open, so callers
+        (e.g. the owning panel handling an outside click) don't need to check
+        `is_open` first.
+        """
+        self.is_open = False
+        self._hovered_index = None
+
+    def draw(self) -> None:
+        """Draw the dropdown header reflecting the current selection and open
+        state.
+
+        This does not draw the option list even while open; call `draw_options`
+        separately, after all other controls, so the list overlays them instead
+        of being drawn beneath.
+        """
+        draw.dropdown_header(
+            surface=self.surface,
+            x=self.x,
+            y=self.y,
+            text=self.value,
+            is_open=self.is_open,
+            width=self.width,
+            height=self.height,
+            font_name=self.font_name,
+            font_size=self.font_size,
+            border_width=self.border_width,
+            border_width_inner=self.border_width_inner,
+            text_shadow_offset=self.text_shadow_offset,
+            arrow_size=self.arrow_size,
+            color_background=(
+                self.color_background_active
+                if self.is_open
+                else self.color_background_inactive
+            ),
+            color_text=self.color_text,
+            color_border=self.color_border,
+            color_border_inner_light=self.color_border_inner_light,
+            color_border_inner_dark=self.color_border_inner_dark,
+            color_text_shadow=self.color_text_shadow,
+            color_arrow=self.color_arrow,
+        )
+
+    def draw_options(self) -> None:
+        """Draw the open option list, overlaying anything beneath it.
+
+        This is a no-op while the dropdown is closed. Callers should invoke this
+        after drawing all other controls so the option list is not drawn over by
+        them.
+        """
+        if not self.is_open:
+            return
+
+        draw.dropdown_options(
+            surface=self.surface,
+            x=self.rect.x,
+            y=self.rect.bottom,
+            options=self.options,
+            hovered_index=self._hovered_index,
+            width=self.width,
+            option_height=self.option_height,
+            font_name=self.font_name,
+            font_size=self.font_size,
+            border_width=self.border_width,
+            color_background_option=self.color_background_option,
+            color_background_option_hover=self.color_background_option_hover,
+            color_text=self.color_text,
+            color_border=self.color_border,
+        )
+
+    def handle_event(self, event: pg.event.Event) -> None:
+        """Open, close, select, or hover based on mouse events.
+
+        While closed, the header toggles open on mouse release if it was pressed
+        down on this control (mirroring Button). While open, mouse motion
+        updates the hovered option row, and a mouse press either selects the
+        option under the cursor (if any) or simply closes the list, since
+        clicking an option or clicking anywhere outside the list should both
+        close it.
+
+        Args:
+            event (pg.event.Event): The pygame event to handle.
+        """
+        if self.is_open:
+            options_rect = self._get_options_rect()
+
+            if event.type == pg.MOUSEMOTION:
+                if options_rect.collidepoint(event.pos):
+                    self._hovered_index = (
+                        event.pos[1] - options_rect.y
+                    ) // self.option_height
+                else:
+                    self._hovered_index = None
+
+            if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+                if options_rect.collidepoint(event.pos):
+                    index = (event.pos[1] - options_rect.y) // self.option_height
+                    self.value = self.options[index]
+
+                self.close()
+
+        else:
+            if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+                if self.rect.collidepoint(event.pos):
+                    self._pressed = True
+
+            if event.type == pg.MOUSEBUTTONUP and event.button == 1:
+                if self._pressed and self.rect.collidepoint(event.pos):
+                    self.is_open = True
+
+                self._pressed = False
