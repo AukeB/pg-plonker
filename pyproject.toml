@@ -5,13 +5,12 @@ description = "pg-plonker is a lightweight PyGame extension for plonking GUI ele
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "pydantic>=2.12.3",
     "pygame>=2.6.1",
-    "pyyaml>=6.0.3",
 ]
 
 [dependency-groups]
 dev = [
+    "deptry>=0.25.1",
     "docstring-tailor>=0.4.1",
     "pyright>=1.1.414",
     "pytest>=8.4.2",
@@ -27,8 +26,15 @@ select = [
     "ANN",  # Annotation rules
 ]
 
+[tool.ruff.lint.per-file-ignores]
+# Tests put two blank lines between imports and the section comments.
+"tests/**" = ["I001"]
+
 [tool.ruff.lint.isort]
-known-first-party = ["src"]
+known-first-party = ["pg_plonker"]
+
+[tool.deptry]
+known_first_party = ["pg_plonker"]
 
 [tool.docstring_tailor]
 line-length = 80

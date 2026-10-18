@@ -13,6 +13,23 @@ class ButtonConfig:
     Button instances when no explicit overrides are provided. This includes
     dimensions, border styling, text rendering settings, and color definitions
     for both active and inactive states.
+
+    Attributes:
+        text (str): Default 'Button'.
+        font_name (str): Default 'arial'.
+        font_size (int): Default 50.
+        width (int): Default 540.
+        height (int): Default 108.
+        border_width (int): Default 5.
+        border_width_inner (int): Default 3.
+        text_shadow_offset (int): Default 3.
+        color_background_active (RGBColor): Default (200, 150, 150).
+        color_background_inactive (RGBColor): Default (150, 150, 150).
+        color_text (RGBColor): Default (255, 255, 255).
+        color_border (RGBColor): Default (0, 0, 0).
+        color_border_inner_light (RGBColor): Default (198, 198, 198).
+        color_border_inner_dark (RGBColor): Default (85, 85, 85).
+        color_text_shadow (RGBColor): Default (0, 0, 0).
     """
 
     # Text and font settings.
@@ -45,6 +62,21 @@ class SliderConfig:
     Slider instances when no explicit overrides are provided. This includes
     track and handle dimensions, precision settings for the displayed value, and
     color definitions for the track, handle, border, and value readout.
+
+    Attributes:
+        font_name (str): Default 'arial'.
+        font_size (int): Default 28.
+        width (int): Default 540.
+        height (int): Default 12.
+        handle_radius (int): Default 16.
+        border_width (int): Default 3.
+        margin_vertical (int): Default 24.
+        extra_decimal_places (int): Default 2.
+        color_track (RGBColor): Default (150, 150, 150).
+        color_track_filled (RGBColor): Default (200, 150, 150).
+        color_handle (RGBColor): Default (230, 230, 230).
+        color_border (RGBColor): Default (0, 0, 0).
+        color_text (RGBColor): Default (0, 0, 0).
     """
 
     # Text and font settings.
@@ -80,6 +112,27 @@ class DropdownConfig:
     the closed header's dimensions, the open option list's row height, border
     styling, text rendering settings, and color definitions for the header
     (open/closed), each option row (default/hovered), and the arrow indicator.
+
+    Attributes:
+        font_name (str): Default 'arial'.
+        font_size (int): Default 32.
+        width (int): Default 540.
+        height (int): Default 72.
+        option_height (int): Default 60.
+        border_width (int): Default 5.
+        border_width_inner (int): Default 3.
+        text_shadow_offset (int): Default 3.
+        arrow_size (int): Default 14.
+        color_background_active (RGBColor): Default (200, 150, 150).
+        color_background_inactive (RGBColor): Default (150, 150, 150).
+        color_background_option (RGBColor): Default (170, 170, 170).
+        color_background_option_hover (RGBColor): Default (200, 150, 150).
+        color_text (RGBColor): Default (255, 255, 255).
+        color_border (RGBColor): Default (0, 0, 0).
+        color_border_inner_light (RGBColor): Default (198, 198, 198).
+        color_border_inner_dark (RGBColor): Default (85, 85, 85).
+        color_text_shadow (RGBColor): Default (0, 0, 0).
+        color_arrow (RGBColor): Default (255, 255, 255).
     """
 
     # Text and font settings.
@@ -115,6 +168,15 @@ class GUIPanelConfig:
     Defines the default geometry, spacing, alignment, and visual appearance of a
     GUIPanel instance. Controls how the panel is positioned within the main
     surface and how child UI elements are spaced and aligned inside it.
+
+    Attributes:
+        width (int): Default 620.
+        border_width (int): Default 2.
+        margin_gui_panel (int): Default 40.
+        margin_button (int): Default 24.
+        align_right (bool): Default True.
+        color_background (RGBColor): Default (230, 230, 230).
+        color_border (RGBColor): Default (0, 0, 0).
     """
 
     # Size and distance settings.

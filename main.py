@@ -3,7 +3,6 @@
 import pygame as pg
 
 from pg_plonker.gui_panel import GUIPanel
-from pg_plonker.controls import Button, Slider, Dropdown
 from pg_plonker.utils import get_window_size_from_screen_resolution
 
 

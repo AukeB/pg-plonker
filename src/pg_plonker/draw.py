@@ -72,44 +72,54 @@ def button(
         color_text_shadow (RGBColor | None): Text shadow color, overrides config
             if provided.
     """
+
     # Get all arguments, either from function input or config.
     width = width if width is not None else _config_button.width
     height = height if height is not None else _config_button.height
     text = text if text is not None else _config_button.text
     font_name = font_name if font_name is not None else _config_button.font_name
     font_size = font_size if font_size is not None else _config_button.font_size
+
     border_width = (
         border_width if border_width is not None else _config_button.border_width
     )
+
     border_width_inner = (
         border_width_inner
         if border_width_inner is not None
         else _config_button.border_width_inner
     )
+
     text_shadow_offset = (
         text_shadow_offset
         if text_shadow_offset is not None
         else _config_button.text_shadow_offset
     )
+
     color_background = (
         color_background
         if color_background is not None
         else _config_button.color_background_inactive
     )
+
     color_text = color_text if color_text is not None else _config_button.color_text
+
     color_border = (
         color_border if color_border is not None else _config_button.color_border
     )
+
     color_border_inner_light = (
         color_border_inner_light
         if color_border_inner_light is not None
         else _config_button.color_border_inner_light
     )
+
     color_border_inner_dark = (
         color_border_inner_dark
         if color_border_inner_dark is not None
         else _config_button.color_border_inner_dark
     )
+
     color_text_shadow = (
         color_text_shadow
         if color_text_shadow is not None
@@ -132,6 +142,7 @@ def button(
         inner_rect.topright,
         border_width_inner,
     )
+
     pg.draw.line(
         surface,
         color_border_inner_light,
@@ -139,6 +150,7 @@ def button(
         inner_rect.bottomleft,
         border_width_inner,
     )
+
     pg.draw.line(
         surface,
         color_border_inner_dark,
@@ -146,6 +158,7 @@ def button(
         inner_rect.bottomright,
         border_width_inner,
     )
+
     pg.draw.line(
         surface,
         color_border_inner_dark,
@@ -155,12 +168,14 @@ def button(
     )
 
     shadow_surface = font.render(text, True, color_text_shadow)
+
     shadow_rect = shadow_surface.get_rect(
         center=(
             rect.centerx + text_shadow_offset,
             rect.centery + text_shadow_offset,
         )
     )
+
     surface.blit(shadow_surface, shadow_rect)
 
     text_surface = font.render(text, True, color_text)
@@ -228,29 +243,37 @@ def slider(
         color_text (RGBColor | None): Value readout text color, overrides config
             if provided.
     """
+
     # Get all arguments, either from function input or config.
     width = width if width is not None else _config_slider.width
     height = height if height is not None else _config_slider.height
+
     handle_radius = (
         handle_radius if handle_radius is not None else _config_slider.handle_radius
     )
+
     border_width = (
         border_width if border_width is not None else _config_slider.border_width
     )
+
     font_name = font_name if font_name is not None else _config_slider.font_name
     font_size = font_size if font_size is not None else _config_slider.font_size
     color_track = color_track if color_track is not None else _config_slider.color_track
+
     color_track_filled = (
         color_track_filled
         if color_track_filled is not None
         else _config_slider.color_track_filled
     )
+
     color_handle = (
         color_handle if color_handle is not None else _config_slider.color_handle
     )
+
     color_border = (
         color_border if color_border is not None else _config_slider.color_border
     )
+
     color_text = color_text if color_text is not None else _config_slider.color_text
 
     # Definitions depending on function/config input.
@@ -269,9 +292,11 @@ def slider(
     if show_value:
         font = get_font(font_name=font_name, font_size=font_size)
         text_surface = font.render(f"{value:.{precision}f}", True, color_text)
+
         text_rect = text_surface.get_rect(
             midbottom=(handle_center[0], handle_center[1] - handle_radius - 4)
         )
+
         surface.blit(text_surface, text_rect)
 
 
@@ -346,25 +371,31 @@ def dropdown_header(
         color_arrow (RGBColor | None): Arrow indicator color, overrides config
             if provided.
     """
+
     # Get all arguments, either from function input or config.
     width = width if width is not None else _config_dropdown.width
     height = height if height is not None else _config_dropdown.height
     font_name = font_name if font_name is not None else _config_dropdown.font_name
     font_size = font_size if font_size is not None else _config_dropdown.font_size
+
     border_width = (
         border_width if border_width is not None else _config_dropdown.border_width
     )
+
     border_width_inner = (
         border_width_inner
         if border_width_inner is not None
         else _config_dropdown.border_width_inner
     )
+
     text_shadow_offset = (
         text_shadow_offset
         if text_shadow_offset is not None
         else _config_dropdown.text_shadow_offset
     )
+
     arrow_size = arrow_size if arrow_size is not None else _config_dropdown.arrow_size
+
     color_background = (
         color_background
         if color_background is not None
@@ -374,25 +405,31 @@ def dropdown_header(
             else _config_dropdown.color_background_inactive
         )
     )
+
     color_text = color_text if color_text is not None else _config_dropdown.color_text
+
     color_border = (
         color_border if color_border is not None else _config_dropdown.color_border
     )
+
     color_border_inner_light = (
         color_border_inner_light
         if color_border_inner_light is not None
         else _config_dropdown.color_border_inner_light
     )
+
     color_border_inner_dark = (
         color_border_inner_dark
         if color_border_inner_dark is not None
         else _config_dropdown.color_border_inner_dark
     )
+
     color_text_shadow = (
         color_text_shadow
         if color_text_shadow is not None
         else _config_dropdown.color_text_shadow
     )
+
     color_arrow = (
         color_arrow if color_arrow is not None else _config_dropdown.color_arrow
     )
@@ -413,6 +450,7 @@ def dropdown_header(
         inner_rect.topright,
         border_width_inner,
     )
+
     pg.draw.line(
         surface,
         color_border_inner_light,
@@ -420,6 +458,7 @@ def dropdown_header(
         inner_rect.bottomleft,
         border_width_inner,
     )
+
     pg.draw.line(
         surface,
         color_border_inner_dark,
@@ -427,6 +466,7 @@ def dropdown_header(
         inner_rect.bottomright,
         border_width_inner,
     )
+
     pg.draw.line(
         surface,
         color_border_inner_dark,
@@ -440,9 +480,11 @@ def dropdown_header(
     text_x = rect.x + border_width_inner * 2 + 12
 
     shadow_surface = font.render(text, True, color_text_shadow)
+
     shadow_rect = shadow_surface.get_rect(
         midleft=(text_x + text_shadow_offset, rect.centery + text_shadow_offset)
     )
+
     surface.blit(shadow_surface, shadow_rect)
 
     text_surface = font.render(text, True, color_text)
@@ -452,6 +494,7 @@ def dropdown_header(
     # Arrow indicator: points up while open, down while closed.
     arrow_x = rect.right - border_width_inner * 2 - 12 - arrow_size
     arrow_y = rect.centery
+
     if is_open:
         arrow_points = [
             (arrow_x - arrow_size, arrow_y + arrow_size // 2),
@@ -464,6 +507,7 @@ def dropdown_header(
             (arrow_x + arrow_size, arrow_y - arrow_size // 2),
             (arrow_x, arrow_y + arrow_size // 2),
         ]
+
     pg.draw.polygon(surface, color_arrow, arrow_points)
 
 
@@ -520,27 +564,35 @@ def dropdown_options(
         color_border (RGBColor | None): Row border color, overrides config if
             provided.
     """
+
     # Get all arguments, either from function input or config.
     width = width if width is not None else _config_dropdown.width
+
     option_height = (
         option_height if option_height is not None else _config_dropdown.option_height
     )
+
     font_name = font_name if font_name is not None else _config_dropdown.font_name
     font_size = font_size if font_size is not None else _config_dropdown.font_size
+
     border_width = (
         border_width if border_width is not None else _config_dropdown.border_width
     )
+
     color_background_option = (
         color_background_option
         if color_background_option is not None
         else _config_dropdown.color_background_option
     )
+
     color_background_option_hover = (
         color_background_option_hover
         if color_background_option_hover is not None
         else _config_dropdown.color_background_option_hover
     )
+
     color_text = color_text if color_text is not None else _config_dropdown.color_text
+
     color_border = (
         color_border if color_border is not None else _config_dropdown.color_border
     )
@@ -550,6 +602,7 @@ def dropdown_options(
     # Drawing operations.
     for index, option_text in enumerate(options):
         row_rect = pg.Rect(x, y + index * option_height, width, option_height)
+
         color_background = (
             color_background_option_hover
             if index == hovered_index

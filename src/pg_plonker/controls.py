@@ -18,7 +18,37 @@ _config_dropdown = DropdownConfig()
 
 
 class Button:
-    """A stateful toggle button that delegates rendering to draw.button."""
+    """A stateful toggle button that delegates rendering to draw.button.
+
+    Attributes:
+        surface (Surface): The pygame surface the button is drawn onto.
+        x (int): X-position of the button in pixels.
+        y (int): Y-position of the button in pixels.
+        width (int): Button width in pixels.
+        height (int): Button height in pixels.
+        text (str | None): Label rendered inside the button.
+        font_name (str | None): System font name used for the label.
+        font_size (int | None): Font size in points for the label.
+        border_width (int | None): Outer border thickness in pixels.
+        border_width_inner (int | None): Inner border thickness in pixels.
+        text_shadow_offset (int | None): Pixel offset of the text shadow.
+        color_background_active (RGBColor): Background color when active.
+        color_background_inactive (RGBColor): Background color when inactive.
+        color_text (RGBColor | None): Color of the button text.
+        color_border (RGBColor | None): Outer border color.
+        color_border_inner_light (RGBColor | None): Light inner border color.
+        color_border_inner_dark (RGBColor | None): Dark inner border color.
+        color_text_shadow (RGBColor | None): Color of the text shadow.
+        rect (pg.Rect): The button's bounding rectangle.
+        value (bool): Toggle state, True when active.
+
+    Example:
+        >>> screen = pg.display.set_mode((800, 600))
+        >>> button = Button(surface=screen, x=20, y=20, text="Start")
+        >>> button.draw()
+        >>> button.value
+        False
+    """
 
     def __init__(
         self,
@@ -83,6 +113,7 @@ class Button:
             value (bool): Initial toggle value of the button (False = inactive,
                 True = active).
         """
+
         # Display.
         self.surface = surface
         self.x = x
@@ -95,16 +126,19 @@ class Button:
         self.border_width = border_width
         self.border_width_inner = border_width_inner
         self.text_shadow_offset = text_shadow_offset
+
         self.color_background_active = (
             color_background_active
             if color_background_active is not None
             else _config_button.color_background_active
         )
+
         self.color_background_inactive = (
             color_background_inactive
             if color_background_inactive is not None
             else _config_button.color_background_inactive
         )
+
         self.color_text = color_text
         self.color_border = color_border
         self.color_border_inner_light = color_border_inner_light
@@ -120,6 +154,7 @@ class Button:
 
     def draw(self) -> None:
         """Draw the button reflecting the current toggle state."""
+
         color_background = (
             self.color_background_active
             if self.value
@@ -153,6 +188,7 @@ class Button:
         Args:
             event (pg.event.Event): The pygame event to handle.
         """
+
         if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
             if self.rect.collidepoint(event.pos):
                 self._pressed = True
@@ -165,7 +201,42 @@ class Button:
 
 
 class Slider:
-    """A stateful horizontal slider that delegates rendering to draw.slider."""
+    """A stateful horizontal slider that delegates rendering to draw.slider.
+
+    Attributes:
+        surface (Surface): The pygame surface the slider is drawn onto.
+        x (int): X-position of the track's left edge in pixels.
+        y (int): Y-position of the track's vertical center in pixels.
+        start (int | float): The minimum value of the range.
+        stop (int | float): The maximum value of the range.
+        step (int | float | None): Increment the value snaps to when dragging.
+        width (int): Track width in pixels.
+        height (int): Track height in pixels.
+        handle_radius (int | None): Handle circle radius in pixels.
+        border_width (int | None): Handle border thickness in pixels.
+        margin_vertical (int): Vertical spacing reserved around the track in a
+            panel.
+        font_name (str | None): System font name used for the value readout.
+        font_size (int | None): Font size in points for the value readout.
+        extra_decimal_places (int): Decimal places added on top of the implied
+            precision.
+        show_value (bool): Whether the current value is drawn above the handle.
+        color_track (RGBColor | None): Track fill color.
+        color_track_filled (RGBColor | None): Color of the filled part of the
+            track.
+        color_handle (RGBColor | None): Handle fill color.
+        color_border (RGBColor | None): Handle border color.
+        color_text (RGBColor | None): Value readout text color.
+        rect (pg.Rect): The track's bounding rectangle.
+        value (int | float): The current value, within [start, stop].
+
+    Example:
+        >>> screen = pg.display.set_mode((800, 600))
+        >>> slider = Slider(surface=screen, x=20, y=40, start=0, stop=10, value=5)
+        >>> slider.draw()
+        >>> slider.value
+        5.0
+    """
 
     def __init__(
         self,
@@ -241,6 +312,7 @@ class Slider:
             ValueError: If start is not strictly less than stop, or if value
                 falls outside the [start, stop] range.
         """
+
         if start >= stop:
             raise ValueError(f"start ({start}) must be less than stop ({stop}).")
 
@@ -256,24 +328,30 @@ class Slider:
         self.step = step
         self.width = width if width is not None else _config_slider.width
         self.height = height if height is not None else _config_slider.height
+
         self.handle_radius = (
             handle_radius if handle_radius is not None else _config_slider.handle_radius
         )
+
         self.border_width = (
             border_width if border_width is not None else _config_slider.border_width
         )
+
         self.margin_vertical = (
             margin_vertical
             if margin_vertical is not None
             else _config_slider.margin_vertical
         )
+
         self.font_name = font_name
         self.font_size = font_size
+
         self.extra_decimal_places = (
             extra_decimal_places
             if extra_decimal_places is not None
             else _config_slider.extra_decimal_places
         )
+
         self.show_value = show_value
         self.color_track = color_track
         self.color_track_filled = color_track_filled
@@ -287,14 +365,11 @@ class Slider:
         # The decimal count implied by start/stop/step, plus a buffer, so
         # dragged values stay free of floating-point noise while remaining
         # readable.
-        self._precision = (
-            max(
-                count_decimal_places(self.start),
-                count_decimal_places(self.stop),
-                count_decimal_places(self.step) if self.step is not None else 0,
-            )
-            + self.extra_decimal_places
-        )
+        start_decimals = count_decimal_places(self.start)
+        stop_decimals = count_decimal_places(self.stop)
+        step_decimals = count_decimal_places(self.step) if self.step is not None else 0
+        largest_decimals = max(start_decimals, stop_decimals, step_decimals)
+        self._precision = largest_decimals + self.extra_decimal_places
 
         # State.
         self.value = round(value if value is not None else self.start, self._precision)
@@ -307,6 +382,7 @@ class Slider:
             handle_center (tuple[int, int]): The (x, y) pixel position of the
                 handle's center.
         """
+
         fraction = (self.value - self.start) / (self.stop - self.start)
         handle_x = self.x + int(fraction * self.width)
         handle_center = (handle_x, self.y)
@@ -329,7 +405,10 @@ class Slider:
         Returns:
             value (int | float): The resulting value, clamped to [start, stop].
         """
-        clamped_x = max(self.x, min(mouse_x, self.x + self.width))
+
+        right_edge = self.x + self.width
+        clamped_right = min(mouse_x, right_edge)
+        clamped_x = max(self.x, clamped_right)
         fraction = (clamped_x - self.x) / self.width
         raw_value = self.start + fraction * (self.stop - self.start)
 
@@ -338,12 +417,14 @@ class Slider:
             raw_value = self.start + steps_from_start * self.step
 
         value = round(raw_value, self._precision)
-        value = max(self.start, min(value, self.stop))
+        capped_value = min(value, self.stop)
+        value = max(self.start, capped_value)
 
         return value
 
     def draw(self) -> None:
         """Draw the slider reflecting the current value."""
+
         draw.slider(
             surface=self.surface,
             x=self.x,
@@ -377,6 +458,7 @@ class Slider:
         Args:
             event (pg.event.Event): The pygame event to handle.
         """
+
         handle_center = self._get_handle_center()
         handle_rect = pg.Rect(0, 0, self.handle_radius * 2, self.handle_radius * 2)
         handle_rect.center = handle_center
@@ -395,6 +477,45 @@ class Slider:
 class Dropdown:
     """A stateful dropdown/select control that delegates rendering to
     draw.dropdown_header and draw.dropdown_options.
+
+    Attributes:
+        surface (Surface): The pygame surface the dropdown is drawn onto.
+        x (int): X-position of the header in pixels.
+        y (int): Y-position of the header in pixels.
+        options (list[str]): The selectable option labels, in display order.
+        width (int): Header and option width in pixels.
+        height (int): Header height in pixels.
+        option_height (int): Height of each option row in pixels.
+        font_name (str | None): System font name used for the text.
+        font_size (int | None): Font size in points for the text.
+        border_width (int | None): Outer border thickness in pixels.
+        border_width_inner (int | None): Inner border thickness in pixels.
+        text_shadow_offset (int | None): Pixel offset of the header's text
+            shadow.
+        arrow_size (int | None): Half-width and height of the arrow in pixels.
+        color_background_active (RGBColor): Header background color while open.
+        color_background_inactive (RGBColor): Header background color while
+            closed.
+        color_background_option (RGBColor | None): Default option row
+            background.
+        color_background_option_hover (RGBColor | None): Hovered option row
+            background.
+        color_text (RGBColor | None): Header and option text color.
+        color_border (RGBColor | None): Outer and option border color.
+        color_border_inner_light (RGBColor | None): Light inner border color.
+        color_border_inner_dark (RGBColor | None): Dark inner border color.
+        color_text_shadow (RGBColor | None): Color of the header's text shadow.
+        color_arrow (RGBColor | None): Arrow indicator color.
+        rect (pg.Rect): The header's bounding rectangle.
+        value (str): The selected option.
+        is_open (bool): Whether the option list is open.
+
+    Example:
+        >>> screen = pg.display.set_mode((800, 600))
+        >>> dropdown = Dropdown(surface=screen, x=20, y=20, options=["Easy", "Hard"])
+        >>> dropdown.value
+        'Easy'
+        >>> dropdown.draw()
     """
 
     def __init__(
@@ -482,6 +603,7 @@ class Dropdown:
             ValueError: If options is empty, or if value is provided but is not
                 one of options.
         """
+
         if not options:
             raise ValueError("options must not be empty.")
 
@@ -495,27 +617,32 @@ class Dropdown:
         self.options = options
         self.width = width if width is not None else _config_dropdown.width
         self.height = height if height is not None else _config_dropdown.height
+
         self.option_height = (
             option_height
             if option_height is not None
             else _config_dropdown.option_height
         )
+
         self.font_name = font_name
         self.font_size = font_size
         self.border_width = border_width
         self.border_width_inner = border_width_inner
         self.text_shadow_offset = text_shadow_offset
         self.arrow_size = arrow_size
+
         self.color_background_active = (
             color_background_active
             if color_background_active is not None
             else _config_dropdown.color_background_active
         )
+
         self.color_background_inactive = (
             color_background_inactive
             if color_background_inactive is not None
             else _config_dropdown.color_background_inactive
         )
+
         self.color_background_option = color_background_option
         self.color_background_option_hover = color_background_option_hover
         self.color_text = color_text
@@ -541,12 +668,18 @@ class Dropdown:
             options_rect (pg.Rect): The rect covering all option rows, stacked
                 directly below the header.
         """
-        return pg.Rect(
+
+        option_count = len(self.options)
+        options_height = self.option_height * option_count
+
+        options_rect = pg.Rect(
             self.rect.x,
             self.rect.bottom,
             self.rect.width,
-            self.option_height * len(self.options),
+            options_height,
         )
+
+        return options_rect
 
     def close(self) -> None:
         """Close the option list without changing the selected value.
@@ -555,6 +688,7 @@ class Dropdown:
         (e.g. the owning panel handling an outside click) don't need to check
         `is_open` first.
         """
+
         self.is_open = False
         self._hovered_index = None
 
@@ -566,6 +700,7 @@ class Dropdown:
         separately, after all other controls, so the list overlays them instead
         of being drawn beneath.
         """
+
         draw.dropdown_header(
             surface=self.surface,
             x=self.x,
@@ -600,6 +735,7 @@ class Dropdown:
         after drawing all other controls so the option list is not drawn over by
         them.
         """
+
         if not self.is_open:
             return
 
@@ -633,6 +769,7 @@ class Dropdown:
         Args:
             event (pg.event.Event): The pygame event to handle.
         """
+
         if self.is_open:
             options_rect = self._get_options_rect()
 

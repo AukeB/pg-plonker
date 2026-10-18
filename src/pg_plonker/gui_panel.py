@@ -10,7 +10,28 @@ _config_gui_panel = GUIPanelConfig()
 
 
 class GUIPanel:
-    """A side panel that owns and lays out stateful controls."""
+    """A side panel that owns and lays out stateful controls.
+
+    Attributes:
+        surface (Surface): The main pygame surface the panel is attached to.
+        width (int): Width of the panel in pixels.
+        border_width (int): Thickness of the divider line in pixels.
+        margin_gui_panel (int): Top padding inside the panel.
+        margin_button (int): Vertical spacing between controls.
+        align_right (bool): Whether the panel is anchored to the right edge.
+        color_background (RGBColor): Background fill color of the panel.
+        color_border (RGBColor): Color of the divider line.
+        rect_panel (Rect): The panel's rectangle within the main surface.
+        subsurface (Surface): The panel's local drawing surface.
+        divider_x (int): Pixel column of the divider line.
+
+    Example:
+        >>> screen = pg.display.set_mode((1000, 700))
+        >>> panel = GUIPanel(surface=screen)
+        >>> grid_toggle = panel.add_button(text="Toggle Grid")
+        >>> panel.handle_event(event)
+        >>> panel.draw()
+    """
 
     def __init__(
         self,
@@ -50,30 +71,37 @@ class GUIPanel:
                 panel.
             color_border (RGBColor | None): Color of the divider line.
         """
+
         # Get all arguments, either from function input or config.
         self.surface = surface
         self.width = width if width is not None else _config_gui_panel.width
+
         self.border_width = (
             border_width if border_width is not None else _config_gui_panel.border_width
         )
+
         self.margin_gui_panel = (
             margin_gui_panel
             if margin_gui_panel is not None
             else _config_gui_panel.margin_gui_panel
         )
+
         self.margin_button = (
             margin_button
             if margin_button is not None
             else _config_gui_panel.margin_button
         )
+
         self.align_right = (
             align_right if align_right is not None else _config_gui_panel.align_right
         )
+
         self.color_background = (
             color_background
             if color_background is not None
             else _config_gui_panel.color_background
         )
+
         self.color_border = (
             color_border if color_border is not None else _config_gui_panel.color_border
         )
@@ -105,22 +133,22 @@ class GUIPanel:
             pg.event.Event | None: A new event with translated coordinates if
                 applicable, otherwise None if the event is outside the panel.
         """
+
         if not hasattr(event, "pos"):
             return event
 
         if not self.rect_panel.collidepoint(event.pos):
             return None
 
-        return pg.event.Event(
-            event.type,
-            {
-                **event.dict,
-                "pos": (
-                    event.pos[0] - self.rect_panel.x,
-                    event.pos[1] - self.rect_panel.y,
-                ),
-            },
+        local_pos = (
+            event.pos[0] - self.rect_panel.x,
+            event.pos[1] - self.rect_panel.y,
         )
+
+        local_attributes = {**event.dict, "pos": local_pos}
+        translated_event = pg.event.Event(event.type, local_attributes)
+
+        return translated_event
 
     def add_button(
         self,
@@ -179,6 +207,7 @@ class GUIPanel:
         Returns:
             Button: The created and layout-managed button instance.
         """
+
         # Create a button. Use 0 for x and y position value. These values will get
         # overwritten because the button will get a predefined place in the UI-panel.
         button = Button(
@@ -287,6 +316,7 @@ class GUIPanel:
         Returns:
             Slider: The created and layout-managed slider instance.
         """
+
         # Create a slider. Use 0 for x and y position value. These values will
         # get overwritten because the slider will get a predefined place in
         # the UI-panel.
@@ -315,9 +345,11 @@ class GUIPanel:
         )
 
         slider_x = (self.width - slider.rect.width) // 2
+
         slider_y = (
             self._next_control_y + slider.margin_vertical + slider.rect.height // 2
         )
+
         slider.x = slider_x
         slider.y = slider_y
 
@@ -414,6 +446,7 @@ class GUIPanel:
         Returns:
             Dropdown: The created and layout-managed dropdown instance.
         """
+
         # Create a dropdown. Use 0 for x and y position value. These values
         # will get overwritten because the dropdown will get a predefined
         # place in the UI-panel.
@@ -487,14 +520,14 @@ class GUIPanel:
         Args:
             event (pg.event.Event): Event from the pygame event queue.
         """
-        open_dropdown = next(
-            (
-                control
-                for control in self._controls
-                if isinstance(control, Dropdown) and control.is_open
-            ),
-            None,
+
+        open_dropdown_candidates = (
+            control
+            for control in self._controls
+            if isinstance(control, Dropdown) and control.is_open
         )
+
+        open_dropdown = next(open_dropdown_candidates, None)
 
         translated = self._translate_event_to_local(event)
 
@@ -505,10 +538,12 @@ class GUIPanel:
                 and event.button == 1
             ):
                 open_dropdown.close()
+
             return
 
         if open_dropdown is not None:
             open_dropdown.handle_event(translated)
+
             return
 
         for control in self._controls:
@@ -529,6 +564,7 @@ class GUIPanel:
         Any open Dropdown's option list is drawn in a second pass, after all
         other controls, so it overlays them instead of being drawn beneath.
         """
+
         self.subsurface.fill(self.color_background)
 
         for control in self._controls:
