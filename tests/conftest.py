@@ -6,8 +6,6 @@ from collections.abc import Iterator
 import pygame as pg
 import pytest
 
-from pg_plonker import utils
-
 
 @pytest.fixture(scope="session", autouse=True, name="headless_pygame")
 def fixture_headless_pygame() -> None:
@@ -30,6 +28,20 @@ def fixture_screen() -> Iterator[pg.Surface]:
 
     yield screen
 
-    # Cached fonts belong to the pygame session that created them, so drop them before quitting.
-    utils._font_cache.clear()
     pg.quit()
+
+
+@pytest.fixture(name="font")
+def fixture_font(screen: pg.Surface) -> pg.font.Font:
+    """Provide a font, created after pygame has been initialised by the screen fixture.
+
+    Args:
+        screen (pg.Surface): The display surface, which initialises pygame.
+
+    Returns:
+        font (pg.font.Font): A font object for drawing text in tests.
+    """
+
+    font = pg.font.Font(None, 32)
+
+    return font

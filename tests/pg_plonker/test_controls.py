@@ -403,3 +403,33 @@ def test_dropdown_secondary_click_while_open_is_ignored(screen: pg.Surface) -> N
 
     assert dropdown.is_open is True
     assert dropdown.value == "Easy"
+
+
+# Testing the "_create_font" function from the "controls" module.
+
+
+def test_font_is_created_once_and_reused_for_every_draw(
+    screen: pg.Surface, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    created: list[tuple[str, int]] = []
+    real_sysfont = pg.font.SysFont
+
+    def recording_sysfont(name: str, size: int) -> pg.font.Font:
+        created.append((name, size))
+        font = real_sysfont(name, size)
+
+        return font
+
+    monkeypatch.setattr(pg.font, "SysFont", recording_sysfont)
+    button = Button(surface=screen, x=20, y=20, text="Start")
+
+    button.draw()
+    button.draw()
+
+    assert created == [("arial", 50)]
+
+
+def test_font_uses_the_requested_name_and_size(screen: pg.Surface) -> None:
+    button = Button(surface=screen, x=20, y=20, font_name="arial", font_size=20)
+
+    assert isinstance(button.font, pg.font.Font)

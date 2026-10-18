@@ -9,7 +9,6 @@ from pg_plonker.gui_config_models import (
     RGBColor,
     SliderConfig,
 )
-from pg_plonker.utils import get_font
 
 _config_button = ButtonConfig()
 _config_slider = SliderConfig()
@@ -20,11 +19,10 @@ def button(
     surface: Surface,
     x: int,
     y: int,
+    font: pg.font.Font,
     width: int | None = None,
     height: int | None = None,
     text: str | None = None,
-    font_name: str | None = None,
-    font_size: int | None = None,
     border_width: int | None = None,
     border_width_inner: int | None = None,
     text_shadow_offset: int | None = None,
@@ -51,9 +49,7 @@ def button(
         height (int | None): Button height in pixels, overrides config if
             provided.
         text (str | None): Label to render centered inside the button.
-        font_name (str | None): System font name, overrides config if provided.
-        font_size (int | None): Font size in points, overrides config if
-            provided.
+        font (pg.font.Font): Font used to render the text.
         border_width (int | None): Outer border thickness in pixels, overrides
             config if provided.
         border_width_inner (int | None): Inner border thickness in pixels,
@@ -77,8 +73,6 @@ def button(
     width = width if width is not None else _config_button.width
     height = height if height is not None else _config_button.height
     text = text if text is not None else _config_button.text
-    font_name = font_name if font_name is not None else _config_button.font_name
-    font_size = font_size if font_size is not None else _config_button.font_size
 
     border_width = (
         border_width if border_width is not None else _config_button.border_width
@@ -129,7 +123,6 @@ def button(
     # Definitions depending on function/config input.
     rect = pg.Rect(x, y, width, height)
     inner_rect = rect.inflate(-border_width * 2, -border_width * 2)
-    font = get_font(font_name=font_name, font_size=font_size)
 
     # Drawing operations.
     pg.draw.rect(surface, color_background, rect)
@@ -191,12 +184,11 @@ def slider(
     stop: int | float,
     value: int | float,
     precision: int,
+    font: pg.font.Font,
     width: int | None = None,
     height: int | None = None,
     handle_radius: int | None = None,
     border_width: int | None = None,
-    font_name: str | None = None,
-    font_size: int | None = None,
     show_value: bool = False,
     color_track: RGBColor | None = None,
     color_track_filled: RGBColor | None = None,
@@ -227,10 +219,7 @@ def slider(
             config if provided.
         border_width (int | None): Handle border thickness in pixels, overrides
             config if provided.
-        font_name (str | None): System font name for the value readout,
-            overrides config if provided.
-        font_size (int | None): Font size in points for the value readout,
-            overrides config if provided.
+        font (pg.font.Font): Font used to render the text.
         show_value (bool): Whether to render the current value above the handle.
         color_track (RGBColor | None): Track fill color, overrides config if
             provided.
@@ -256,8 +245,6 @@ def slider(
         border_width if border_width is not None else _config_slider.border_width
     )
 
-    font_name = font_name if font_name is not None else _config_slider.font_name
-    font_size = font_size if font_size is not None else _config_slider.font_size
     color_track = color_track if color_track is not None else _config_slider.color_track
 
     color_track_filled = (
@@ -290,7 +277,6 @@ def slider(
     pg.draw.circle(surface, color_border, handle_center, handle_radius, border_width)
 
     if show_value:
-        font = get_font(font_name=font_name, font_size=font_size)
         text_surface = font.render(f"{value:.{precision}f}", True, color_text)
 
         text_rect = text_surface.get_rect(
@@ -306,10 +292,9 @@ def dropdown_header(
     y: int,
     text: str,
     is_open: bool,
+    font: pg.font.Font,
     width: int | None = None,
     height: int | None = None,
-    font_name: str | None = None,
-    font_size: int | None = None,
     border_width: int | None = None,
     border_width_inner: int | None = None,
     text_shadow_offset: int | None = None,
@@ -346,9 +331,7 @@ def dropdown_header(
             provided.
         height (int | None): Header height in pixels, overrides config if
             provided.
-        font_name (str | None): System font name, overrides config if provided.
-        font_size (int | None): Font size in points, overrides config if
-            provided.
+        font (pg.font.Font): Font used to render the text.
         border_width (int | None): Outer border thickness in pixels, overrides
             config if provided.
         border_width_inner (int | None): Inner border thickness in pixels,
@@ -375,8 +358,6 @@ def dropdown_header(
     # Get all arguments, either from function input or config.
     width = width if width is not None else _config_dropdown.width
     height = height if height is not None else _config_dropdown.height
-    font_name = font_name if font_name is not None else _config_dropdown.font_name
-    font_size = font_size if font_size is not None else _config_dropdown.font_size
 
     border_width = (
         border_width if border_width is not None else _config_dropdown.border_width
@@ -437,7 +418,6 @@ def dropdown_header(
     # Definitions depending on function/config input.
     rect = pg.Rect(x, y, width, height)
     inner_rect = rect.inflate(-border_width * 2, -border_width * 2)
-    font = get_font(font_name=font_name, font_size=font_size)
 
     # Drawing operations.
     pg.draw.rect(surface, color_background, rect)
@@ -517,10 +497,9 @@ def dropdown_options(
     y: int,
     options: list[str],
     hovered_index: int | None,
+    font: pg.font.Font,
     width: int | None = None,
     option_height: int | None = None,
-    font_name: str | None = None,
-    font_size: int | None = None,
     border_width: int | None = None,
     color_background_option: RGBColor | None = None,
     color_background_option_hover: RGBColor | None = None,
@@ -550,9 +529,7 @@ def dropdown_options(
         width (int | None): Row width in pixels, overrides config if provided.
         option_height (int | None): Row height in pixels, overrides config if
             provided.
-        font_name (str | None): System font name, overrides config if provided.
-        font_size (int | None): Font size in points, overrides config if
-            provided.
+        font (pg.font.Font): Font used to render the text.
         border_width (int | None): Row border thickness in pixels, overrides
             config if provided.
         color_background_option (RGBColor | None): Default row background color,
@@ -571,9 +548,6 @@ def dropdown_options(
     option_height = (
         option_height if option_height is not None else _config_dropdown.option_height
     )
-
-    font_name = font_name if font_name is not None else _config_dropdown.font_name
-    font_size = font_size if font_size is not None else _config_dropdown.font_size
 
     border_width = (
         border_width if border_width is not None else _config_dropdown.border_width
@@ -596,8 +570,6 @@ def dropdown_options(
     color_border = (
         color_border if color_border is not None else _config_dropdown.color_border
     )
-
-    font = get_font(font_name=font_name, font_size=font_size)
 
     # Drawing operations.
     for index, option_text in enumerate(options):

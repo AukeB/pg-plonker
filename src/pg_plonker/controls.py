@@ -17,6 +17,37 @@ _config_slider = SliderConfig()
 _config_dropdown = DropdownConfig()
 
 
+def _create_font(
+    font_name: str | None,
+    font_size: int | None,
+    default_font_name: str,
+    default_font_size: int,
+) -> pg.font.Font:
+    """Create the font a control renders its text with.
+
+    Called once per control, in its constructor, so the font is never created
+    while drawing. The font belongs to the control, not to a shared cache, so it
+    stays valid for as long as the control does.
+
+    Args:
+        font_name (str | None): Requested system font name, or None for the
+            control's default.
+        font_size (int | None): Requested font size in points, or None for the
+            control's default.
+        default_font_name (str): Font name used when font_name is None.
+        default_font_size (int): Font size used when font_size is None.
+
+    Returns:
+        font (pg.font.Font): The font object for the control.
+    """
+
+    resolved_font_name = font_name if font_name is not None else default_font_name
+    resolved_font_size = font_size if font_size is not None else default_font_size
+    font = pg.font.SysFont(name=resolved_font_name, size=resolved_font_size)
+
+    return font
+
+
 class Button:
     """A stateful toggle button that delegates rendering to draw.button.
 
@@ -27,8 +58,7 @@ class Button:
         width (int): Button width in pixels.
         height (int): Button height in pixels.
         text (str | None): Label rendered inside the button.
-        font_name (str | None): System font name used for the label.
-        font_size (int | None): Font size in points for the label.
+        font (pg.font.Font): Font used to render the text.
         border_width (int | None): Outer border thickness in pixels.
         border_width_inner (int | None): Inner border thickness in pixels.
         text_shadow_offset (int | None): Pixel offset of the text shadow.
@@ -121,8 +151,14 @@ class Button:
         self.width = width if width is not None else _config_button.width
         self.height = height if height is not None else _config_button.height
         self.text = text
-        self.font_name = font_name
-        self.font_size = font_size
+
+        self.font = _create_font(
+            font_name=font_name,
+            font_size=font_size,
+            default_font_name=_config_button.font_name,
+            default_font_size=_config_button.font_size,
+        )
+
         self.border_width = border_width
         self.border_width_inner = border_width_inner
         self.text_shadow_offset = text_shadow_offset
@@ -168,8 +204,7 @@ class Button:
             width=self.width,
             height=self.height,
             text=self.text,
-            font_name=self.font_name,
-            font_size=self.font_size,
+            font=self.font,
             border_width=self.border_width,
             border_width_inner=self.border_width_inner,
             text_shadow_offset=self.text_shadow_offset,
@@ -216,8 +251,7 @@ class Slider:
         border_width (int | None): Handle border thickness in pixels.
         margin_vertical (int): Vertical spacing reserved around the track in a
             panel.
-        font_name (str | None): System font name used for the value readout.
-        font_size (int | None): Font size in points for the value readout.
+        font (pg.font.Font): Font used to render the text.
         extra_decimal_places (int): Decimal places added on top of the implied
             precision.
         show_value (bool): Whether the current value is drawn above the handle.
@@ -343,8 +377,12 @@ class Slider:
             else _config_slider.margin_vertical
         )
 
-        self.font_name = font_name
-        self.font_size = font_size
+        self.font = _create_font(
+            font_name=font_name,
+            font_size=font_size,
+            default_font_name=_config_slider.font_name,
+            default_font_size=_config_slider.font_size,
+        )
 
         self.extra_decimal_places = (
             extra_decimal_places
@@ -437,8 +475,7 @@ class Slider:
             height=self.height,
             handle_radius=self.handle_radius,
             border_width=self.border_width,
-            font_name=self.font_name,
-            font_size=self.font_size,
+            font=self.font,
             show_value=self.show_value,
             color_track=self.color_track,
             color_track_filled=self.color_track_filled,
@@ -486,8 +523,7 @@ class Dropdown:
         width (int): Header and option width in pixels.
         height (int): Header height in pixels.
         option_height (int): Height of each option row in pixels.
-        font_name (str | None): System font name used for the text.
-        font_size (int | None): Font size in points for the text.
+        font (pg.font.Font): Font used to render the text.
         border_width (int | None): Outer border thickness in pixels.
         border_width_inner (int | None): Inner border thickness in pixels.
         text_shadow_offset (int | None): Pixel offset of the header's text
@@ -624,8 +660,13 @@ class Dropdown:
             else _config_dropdown.option_height
         )
 
-        self.font_name = font_name
-        self.font_size = font_size
+        self.font = _create_font(
+            font_name=font_name,
+            font_size=font_size,
+            default_font_name=_config_dropdown.font_name,
+            default_font_size=_config_dropdown.font_size,
+        )
+
         self.border_width = border_width
         self.border_width_inner = border_width_inner
         self.text_shadow_offset = text_shadow_offset
@@ -709,8 +750,7 @@ class Dropdown:
             is_open=self.is_open,
             width=self.width,
             height=self.height,
-            font_name=self.font_name,
-            font_size=self.font_size,
+            font=self.font,
             border_width=self.border_width,
             border_width_inner=self.border_width_inner,
             text_shadow_offset=self.text_shadow_offset,
@@ -747,8 +787,7 @@ class Dropdown:
             hovered_index=self._hovered_index,
             width=self.width,
             option_height=self.option_height,
-            font_name=self.font_name,
-            font_size=self.font_size,
+            font=self.font,
             border_width=self.border_width,
             color_background_option=self.color_background_option,
             color_background_option_hover=self.color_background_option_hover,

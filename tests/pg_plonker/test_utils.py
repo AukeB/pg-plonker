@@ -5,10 +5,8 @@ import math
 import pygame as pg
 import pytest
 
-from pg_plonker import utils
 from pg_plonker.utils import (
     count_decimal_places,
-    get_font,
     get_window_size_from_screen_resolution,
 )
 
@@ -44,27 +42,6 @@ def test_window_size_initializes_display_when_needed(monkeypatch: pytest.MonkeyP
     get_window_size_from_screen_resolution()
 
     assert initialized == [True]
-
-
-# Testing the "get_font" function.
-
-
-def test_get_font_caches_each_font_once(monkeypatch: pytest.MonkeyPatch) -> None:
-    created: list[tuple[str, int]] = []
-
-    def fake_sysfont(name: str, size: int) -> str:
-        created.append((name, size))
-
-        return f"font-{name}-{size}"
-
-    monkeypatch.setattr(utils, "_font_cache", {})
-    monkeypatch.setattr(pg.font, "SysFont", fake_sysfont)
-
-    first = get_font(font_name="arial", font_size=12)
-    second = get_font(font_name="arial", font_size=12)
-
-    assert first == second == "font-arial-12"
-    assert created == [("arial", 12)]
 
 
 # Testing the "count_decimal_places" function.
