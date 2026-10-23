@@ -1,4 +1,11 @@
-"""Utility module with helper functions."""
+"""Utility module with helper functions.
+
+Functions:
+- get_window_size_from_screen_resolution: Size a window relative to the desktop
+  resolution.
+- count_decimal_places: Count the decimal digits in a number's shortest string
+  form.
+"""
 
 from decimal import Decimal
 

@@ -20,6 +20,22 @@ pip install -e .
 
 ---
 
+## Importing
+
+The top-level package exposes the controls, the panel, the `draw` module, and the config models. The convention is to import it as `pgp`:
+
+```python
+import pg_plonker as pgp
+
+button = pgp.Button(surface=screen, x=100, y=100)
+panel = pgp.GUIPanel(surface=screen)
+pgp.draw.button(surface=screen, x=100, y=200, width=180, height=36, text="Toggle grid")
+```
+
+Each name is also available from its module, such as `from pg_plonker.gui_panel import GUIPanel`.
+
+---
+
 ## Quick start
 
 ```python
@@ -181,6 +197,8 @@ panel = GUIPanel(surface=screen, width=300, color_background=(20, 20, 20))
 Visual and layout defaults for `Button` and `GUIPanel` live in `gui_config_models.py`, as frozen dataclasses:
 
 - `ButtonConfig` — text, font, sizing, borders, and colors for both active and inactive states.
+- `SliderConfig` — slider track, handle, and value display.
+- `DropdownConfig` — dropdown header and options list styling.
 - `GUIPanelConfig` — panel width, border, margins, alignment, and colors.
 
 Every parameter on `Button`, `GUIPanel`, and `draw.button` is optional and falls back to these defaults; pass any subset of them to override.
@@ -191,9 +209,7 @@ Every parameter on `Button`, `GUIPanel`, and `draw.button` is optional and falls
 
 pg-plonker is under active development. A prioritized list of what's planned but not yet built lives in [`TODO.md`](TODO.md):
 
-- Slider and drop-down list controls
 - Button press animations and click sound effects
 - A pre-made visual style system (`set_style`)
 - A pluggable layout mode system (`set_mode`), generalizing what `GUIPanel` does today
-- A top-level ergonomic import surface (`pgplonker as pgp`)
 - PyPI publishing

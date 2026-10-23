@@ -1,4 +1,8 @@
-"""Module for running the pg-plonker demo application."""
+"""Module for running the pg-plonker demo application.
+
+Functions:
+- main: Run the pg-plonker demo application.
+"""
 
 import pygame as pg
 

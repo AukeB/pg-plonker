@@ -1,4 +1,7 @@
-"""Module for the UIPanel control container."""
+"""Module for the UIPanel control container.
+
+Classes: - GUIPanel: A side panel that owns and lays out stateful controls.
+"""
 
 import pygame as pg
 from pygame import Rect, Surface

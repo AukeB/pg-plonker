@@ -1,4 +1,11 @@
-"""Module for the stateful controls."""
+"""Module for the stateful controls.
+
+Classes:
+- Button: A stateful toggle button that delegates rendering to draw.button.
+- Slider: A stateful horizontal slider that delegates rendering to draw.slider.
+- Dropdown: A stateful dropdown that delegates rendering to the draw.dropdown
+  functions.
+"""
 
 import pygame as pg
 from pygame import Surface

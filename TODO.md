@@ -46,11 +46,11 @@ Planned work for pg-plonker, sorted by priority (highest first). See `README.md`
 - [x] Implement `Slider` class (value, `handle_event`, `draw`).
 - [x] Add a `SliderConfig` default config model.
 - [x] Wire `Slider` into `GUIPanel.add_slider` for automatic layout.
-- [ ] Design `Dropdown` control API (options list, selected value, open/closed state).
-- [ ] Implement `draw.dropdown` stateless drawing function.
-- [ ] Implement `Dropdown` class (value, `handle_event`, `draw`).
-- [ ] Add a `DropdownConfig` default config model.
-- [ ] Wire `Dropdown` into `GUIPanel.add_dropdown` for automatic layout.
+- [x] Design `Dropdown` control API (options list, selected value, open/closed state).
+- [x] Implement `draw.dropdown` stateless drawing function (as `draw.dropdown_header` and `draw.dropdown_options`).
+- [x] Implement `Dropdown` class (value, `handle_event`, `draw`).
+- [x] Add a `DropdownConfig` default config model.
+- [x] Wire `Dropdown` into `GUIPanel.add_dropdown` for automatic layout.
 
 ## 2. Button interaction polish
 
@@ -83,11 +83,11 @@ Planned work for pg-plonker, sorted by priority (highest first). See `README.md`
 
 ## 5. Top-level ergonomic API
 
-- [ ] Decide the public API surface for `src/pg_plonker/__init__.py`.
-- [ ] Export `Button`, `GUIPanel`, `draw`, and the config models from `__init__.py`.
-- [ ] Document the `import pg_plonker as pgp` convention in `README.md`.
+- [x] Decide the public API surface for `src/pg_plonker/__init__.py`.
+- [x] Export `Button`, `GUIPanel`, `draw`, and the config models from `__init__.py`.
+- [x] Document the `import pg_plonker as pgp` convention in `README.md`.
 - [ ] Export `set_style` / `set_mode` from `__init__.py` once implemented.
-- [ ] Add an `__all__` list to `__init__.py` to make the public surface explicit.
+- [x] Add an `__all__` list to `__init__.py` to make the public surface explicit.
 
 ## 6. PyPI publishing
 

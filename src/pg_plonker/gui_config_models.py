@@ -1,4 +1,13 @@
-"""Module for GUI configuration for the pg_plonker package."""
+"""Module for GUI configuration for the pg_plonker package.
+
+Classes:
+- ButtonConfig: Default visual and layout properties of a Button.
+- SliderConfig: Default visual and layout properties of a Slider.
+- DropdownConfig: Default visual and layout properties of a Dropdown.
+- GUIPanelConfig: Default layout and styling of a GUIPanel.
+
+Type aliases: - RGBColor: An (red, green, blue) color tuple.
+"""
 
 from dataclasses import dataclass
 

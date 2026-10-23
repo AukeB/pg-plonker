@@ -1,4 +1,11 @@
-"""Module for stateless pygame drawing functions for UI elements."""
+"""Module for stateless pygame drawing functions for UI elements.
+
+Functions:
+- button: Draw a single button onto the given surface.
+- slider: Draw a single horizontal slider onto the given surface.
+- dropdown_header: Draw a single dropdown header onto the given surface.
+- dropdown_options: Draw a dropdown's open option list onto the given surface.
+"""
 
 import pygame as pg
 from pygame import Surface
