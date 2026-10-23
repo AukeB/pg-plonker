@@ -589,8 +589,25 @@ def dropdown_options(
         )
 
         pg.draw.rect(surface, color_background, row_rect)
-        pg.draw.rect(surface, color_border, row_rect, border_width)
 
         text_surface = font.render(option_text, True, color_text)
         text_rect = text_surface.get_rect(midleft=(row_rect.x + 12, row_rect.centery))
         surface.blit(text_surface, text_rect)
+
+    # Borders are drawn once for the whole list, so the lines between rows are
+    # the same thickness as the outer edge instead of doubled by two rows.
+    for index in range(1, len(options)):
+        separator_rect = pg.Rect(x, y + index * option_height, width, border_width)
+
+        pg.draw.rect(surface, color_border, separator_rect)
+
+    # The outer top edge starts one border width above y, so it sits on top of
+    # the header's bottom border instead of stacking below it.
+    options_rect = pg.Rect(
+        x,
+        y - border_width,
+        width,
+        option_height * len(options) + border_width,
+    )
+
+    pg.draw.rect(surface, color_border, options_rect, border_width)

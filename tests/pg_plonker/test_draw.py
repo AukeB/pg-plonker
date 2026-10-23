@@ -104,3 +104,75 @@ def test_dropdown_options_without_hover_uses_default_color(screen: pg.Surface, f
     pixel = screen.get_at((20 + 540 - 30, 100 + 30))
 
     assert tuple(pixel)[:3] == (8, 9, 10)
+
+
+def test_dropdown_options_separator_is_border_width_thick(screen: pg.Surface, font: pg.font.Font) -> None:
+    draw.dropdown_options(
+        surface=screen,
+        font=font,
+        x=20,
+        y=100,
+        options=["Easy", "Hard"],
+        hovered_index=None,
+        width=200,
+        option_height=60,
+        border_width=2,
+        color_background_option=(8, 9, 10),
+        color_border=(1, 2, 3),
+    )
+
+    above_separator = screen.get_at((20 + 100, 100 + 59))
+    first_separator_row = screen.get_at((20 + 100, 100 + 60))
+    second_separator_row = screen.get_at((20 + 100, 100 + 61))
+    below_separator = screen.get_at((20 + 100, 100 + 62))
+
+    assert tuple(above_separator)[:3] == (8, 9, 10)
+    assert tuple(first_separator_row)[:3] == (1, 2, 3)
+    assert tuple(second_separator_row)[:3] == (1, 2, 3)
+    assert tuple(below_separator)[:3] == (8, 9, 10)
+
+
+def test_dropdown_options_outer_border_is_border_width_thick(screen: pg.Surface, font: pg.font.Font) -> None:
+    draw.dropdown_options(
+        surface=screen,
+        font=font,
+        x=20,
+        y=100,
+        options=["Easy", "Hard"],
+        hovered_index=None,
+        width=200,
+        option_height=60,
+        border_width=2,
+        color_background_option=(8, 9, 10),
+        color_border=(1, 2, 3),
+    )
+
+    left_edge = screen.get_at((20, 100 + 30))
+    inside_left_edge = screen.get_at((20 + 2, 100 + 30))
+
+    assert tuple(left_edge)[:3] == (1, 2, 3)
+    assert tuple(inside_left_edge)[:3] == (8, 9, 10)
+
+
+def test_dropdown_options_top_border_overlaps_header_bottom_border(screen: pg.Surface, font: pg.font.Font) -> None:
+    draw.dropdown_options(
+        surface=screen,
+        font=font,
+        x=20,
+        y=100,
+        options=["Easy", "Hard"],
+        hovered_index=None,
+        width=200,
+        option_height=60,
+        border_width=2,
+        color_background_option=(8, 9, 10),
+        color_border=(1, 2, 3),
+    )
+
+    header_bottom_border = screen.get_at((20 + 100, 100 - 2))
+    header_bottom_border_inner = screen.get_at((20 + 100, 100 - 1))
+    first_row = screen.get_at((20 + 100, 100))
+
+    assert tuple(header_bottom_border)[:3] == (1, 2, 3)
+    assert tuple(header_bottom_border_inner)[:3] == (1, 2, 3)
+    assert tuple(first_row)[:3] == (8, 9, 10)
