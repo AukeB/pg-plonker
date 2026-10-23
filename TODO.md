@@ -55,7 +55,7 @@ Planned work for pg-plonker, sorted by priority (highest first). See `README.md`
 ## 2. Button interaction polish
 
 - [x] Add a "pressed" visual variant to `draw.button` (e.g. depressed border effect).
-- [ ] Trigger the pressed visual on `MOUSEBUTTONDOWN`, revert on `MOUSEBUTTONUP` or pointer leave.
+- [x] Trigger the pressed visual on `MOUSEBUTTONDOWN`, revert on `MOUSEBUTTONUP` or pointer leave.
 - [ ] Add a hover state visual (highlight on mouse-over, before a click).
 - [ ] Pick or source a click sound effect asset.
 - [ ] Play the sound on toggle inside `Button.handle_event`.
