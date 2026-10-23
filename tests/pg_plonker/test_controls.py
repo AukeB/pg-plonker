@@ -222,12 +222,21 @@ def test_slider_drag_updates_value_then_stops_on_release(screen: pg.Surface) -> 
 def test_slider_press_away_from_handle_does_not_drag(screen: pg.Surface) -> None:
     slider = Slider(surface=screen, x=20, y=40, start=0, stop=10, value=5)
 
-    event = _mouse_down((20, 40))
+    event = _mouse_down((20, 40 + 50))
     slider.handle_event(event)
     event = _mouse_motion((400, 40))
     slider.handle_event(event)
 
     assert slider.value == 5
+
+
+def test_slider_press_on_track_jumps_value_to_mouse(screen: pg.Surface) -> None:
+    slider = Slider(surface=screen, x=20, y=40, start=0, stop=10, value=5)
+
+    event = _mouse_down((20 + 162, 40))
+    slider.handle_event(event)
+
+    assert slider.value == 3
 
 
 def test_slider_ignores_secondary_button_press(screen: pg.Surface) -> None:

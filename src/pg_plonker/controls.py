@@ -492,12 +492,12 @@ class Slider:
         )
 
     def handle_event(self, event: pg.event.Event) -> None:
-        """Start, update, or stop a drag based on mouse events near the handle.
+        """Start, update, or stop a drag based on mouse events on the slider.
 
-        A drag starts only when the mouse is pressed down within the handle's
-        bounding box (no click-to-jump on the track). Once dragging, the value
-        updates live on every mouse motion, and the drag ends on mouse release
-        regardless of the release position.
+        A press anywhere on the slider (the handle or the track beside it) jumps
+        the value to the mouse position and starts a drag. Once dragging, the
+        value updates live on every mouse motion, and the drag ends on mouse
+        release regardless of the release position.
 
         Args:
             event (pg.event.Event): The pygame event to handle.
@@ -507,9 +507,19 @@ class Slider:
         handle_rect = pg.Rect(0, 0, self.handle_radius * 2, self.handle_radius * 2)
         handle_rect.center = handle_center
 
+        track_band = pg.Rect(
+            self.x,
+            self.y - self.handle_radius,
+            self.width,
+            self.handle_radius * 2,
+        )
+
         if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-            if handle_rect.collidepoint(event.pos):
+            if handle_rect.collidepoint(event.pos) or track_band.collidepoint(
+                event.pos
+            ):
                 self._dragging = True
+                self.value = self._get_value_from_x(event.pos[0])
 
         if event.type == pg.MOUSEMOTION and self._dragging:
             self.value = self._get_value_from_x(event.pos[0])
