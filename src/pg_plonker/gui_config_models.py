@@ -132,6 +132,7 @@ class DropdownConfig:
         border_width_inner (int): Default 3.
         text_shadow_offset (int): Default 3.
         arrow_size (int): Default 14.
+        text_padding (int): Default 12.
         color_background_active (RGBColor): Default (200, 150, 150).
         color_background_inactive (RGBColor): Default (150, 150, 150).
         color_background_option (RGBColor): Default (170, 170, 170).
@@ -156,6 +157,7 @@ class DropdownConfig:
     border_width_inner: int = 3
     text_shadow_offset: int = 3
     arrow_size: int = 14
+    text_padding: int = 12
 
     # Color settings.
     color_background_active: RGBColor = (200, 150, 150)

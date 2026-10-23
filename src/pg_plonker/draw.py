@@ -39,6 +39,7 @@ def button(
     color_border_inner_light: RGBColor | None = None,
     color_border_inner_dark: RGBColor | None = None,
     color_text_shadow: RGBColor | None = None,
+    pressed: bool = False,
 ) -> None:
     """Draw a single button onto the given surface.
 
@@ -46,6 +47,9 @@ def button(
     defined in the module- level ButtonConfig when not provided. This allows
     quick usage with minimal arguments while still permitting per-call overrides
     of any visual property.
+
+    A pressed button swaps its inner bevel colors so it reads as sunken, without
+    moving.
 
     Args:
         surface (Surface): The pygame surface to draw onto.
@@ -74,6 +78,7 @@ def button(
             overrides config if provided.
         color_text_shadow (RGBColor | None): Text shadow color, overrides config
             if provided.
+        pressed (bool): Whether the button is held down. Defaults to False.
     """
 
     # Get all arguments, either from function input or config.
@@ -131,13 +136,20 @@ def button(
     rect = pg.Rect(x, y, width, height)
     inner_rect = rect.inflate(-border_width * 2, -border_width * 2)
 
+    # A pressed button reads as sunken, so its bevel light and dark swap.
+    color_bevel_light = color_border_inner_light
+    color_bevel_dark = color_border_inner_dark
+
+    if pressed:
+        color_bevel_light, color_bevel_dark = color_bevel_dark, color_bevel_light
+
     # Drawing operations.
     pg.draw.rect(surface, color_background, rect)
     pg.draw.rect(surface, color_border, rect, border_width)
 
     pg.draw.line(
         surface,
-        color_border_inner_light,
+        color_bevel_light,
         inner_rect.topleft,
         inner_rect.topright,
         border_width_inner,
@@ -145,7 +157,7 @@ def button(
 
     pg.draw.line(
         surface,
-        color_border_inner_light,
+        color_bevel_light,
         inner_rect.topleft,
         inner_rect.bottomleft,
         border_width_inner,
@@ -153,7 +165,7 @@ def button(
 
     pg.draw.line(
         surface,
-        color_border_inner_dark,
+        color_bevel_dark,
         inner_rect.bottomleft,
         inner_rect.bottomright,
         border_width_inner,
@@ -161,7 +173,7 @@ def button(
 
     pg.draw.line(
         surface,
-        color_border_inner_dark,
+        color_bevel_dark,
         inner_rect.topright,
         inner_rect.bottomright,
         border_width_inner,
@@ -306,6 +318,7 @@ def dropdown_header(
     border_width_inner: int | None = None,
     text_shadow_offset: int | None = None,
     arrow_size: int | None = None,
+    text_padding: int | None = None,
     color_background: RGBColor | None = None,
     color_text: RGBColor | None = None,
     color_border: RGBColor | None = None,
@@ -347,6 +360,8 @@ def dropdown_header(
             config if provided.
         arrow_size (int | None): Half-width/height of the arrow indicator in
             pixels, overrides config if provided.
+        text_padding (int | None): Space in pixels between the header edge and
+            its label and arrow, overrides config if provided.
         color_background (RGBColor | None): Header background fill color,
             overrides config if provided.
         color_text (RGBColor | None): Text color, overrides config if provided.
@@ -383,6 +398,10 @@ def dropdown_header(
     )
 
     arrow_size = arrow_size if arrow_size is not None else _config_dropdown.arrow_size
+
+    text_padding = (
+        text_padding if text_padding is not None else _config_dropdown.text_padding
+    )
 
     color_background = (
         color_background
@@ -464,7 +483,7 @@ def dropdown_header(
 
     # Selected-option label, left-aligned with room reserved on the right for
     # the arrow.
-    text_x = rect.x + border_width_inner * 2 + 12
+    text_x = rect.x + border_width_inner * 2 + text_padding
 
     shadow_surface = font.render(text, True, color_text_shadow)
 
@@ -479,7 +498,7 @@ def dropdown_header(
     surface.blit(text_surface, text_rect)
 
     # Arrow indicator: points up while open, down while closed.
-    arrow_x = rect.right - border_width_inner * 2 - 12 - arrow_size
+    arrow_x = rect.right - border_width_inner * 2 - text_padding - arrow_size
     arrow_y = rect.centery
 
     if is_open:
@@ -508,6 +527,7 @@ def dropdown_options(
     width: int | None = None,
     option_height: int | None = None,
     border_width: int | None = None,
+    text_padding: int | None = None,
     color_background_option: RGBColor | None = None,
     color_background_option_hover: RGBColor | None = None,
     color_text: RGBColor | None = None,
@@ -547,6 +567,8 @@ def dropdown_options(
             provided.
         color_border (RGBColor | None): Row border color, overrides config if
             provided.
+        text_padding (int | None): Space in pixels between the row's left edge
+            and its label, overrides config if provided.
     """
 
     # Get all arguments, either from function input or config.
@@ -558,6 +580,10 @@ def dropdown_options(
 
     border_width = (
         border_width if border_width is not None else _config_dropdown.border_width
+    )
+
+    text_padding = (
+        text_padding if text_padding is not None else _config_dropdown.text_padding
     )
 
     color_background_option = (
@@ -591,7 +617,9 @@ def dropdown_options(
         pg.draw.rect(surface, color_background, row_rect)
 
         text_surface = font.render(option_text, True, color_text)
-        text_rect = text_surface.get_rect(midleft=(row_rect.x + 12, row_rect.centery))
+        text_rect = text_surface.get_rect(
+            midleft=(row_rect.x + text_padding, row_rect.centery)
+        )
         surface.blit(text_surface, text_rect)
 
     # Borders are drawn once for the whole list, so the lines between rows are

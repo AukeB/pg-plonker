@@ -120,28 +120,28 @@ class GUIPanel:
         self._controls: list[Button | Slider | Dropdown] = []
         self._next_control_y = self.margin_gui_panel
 
-    def _translate_event_to_local(self, event: pg.event.Event) -> pg.event.Event | None:
+    def _translate_event_to_local(self, event: pg.event.Event) -> pg.event.Event:
         """Translate a screen-space pygame event into panel-local coordinates.
 
         This function converts global mouse coordinates into the panel's local
         coordinate space so that child controls can correctly perform hit-
         testing (e.g. collidepoint checks).
 
-        Events occurring outside the panel bounds are ignored and return None.
+        Events outside the panel bounds are translated too, so their local
+        position falls outside every control. Controls still need them, for
+        example to end a press or drag when the mouse is released off the panel.
 
         Args:
             event (pg.event.Event): A pygame event from the main event loop.
 
         Returns:
-            pg.event.Event | None: A new event with translated coordinates if
-                applicable, otherwise None if the event is outside the panel.
+            translated_event (pg.event.Event): The event with its position in
+                panel-local coordinates, or the event unchanged if it has no
+                position.
         """
 
         if not hasattr(event, "pos"):
             return event
-
-        if not self.rect_panel.collidepoint(event.pos):
-            return None
 
         local_pos = (
             event.pos[0] - self.rect_panel.x,
@@ -511,14 +511,17 @@ class GUIPanel:
         being dispatched, ensuring correct hit-testing within the panel's
         subsurface coordinate system.
 
-        Non-mouse events are ignored if they fall outside the panel region.
+        Mouse events outside the panel are forwarded too, so a press or drag
+        that started on a control ends when the mouse is released off the panel.
+        Controls hit-test the local position themselves, so these events never
+        trigger anything new.
 
         While a Dropdown's option list is open, it visually overlays the other
         controls, so it also takes exclusive ownership of events: other controls
         are not forwarded events until it closes again, preventing clicks on the
-        option list from leaking through to whatever it's covering. A click
-        outside the panel entirely still closes an open dropdown, matching
-        "clicking anywhere outside it" closing the list.
+        option list from leaking through to whatever it's covering. The Dropdown
+        closes itself on a click anywhere outside its list, including outside
+        the panel.
 
         Args:
             event (pg.event.Event): Event from the pygame event queue.
@@ -533,16 +536,6 @@ class GUIPanel:
         open_dropdown = next(open_dropdown_candidates, None)
 
         translated = self._translate_event_to_local(event)
-
-        if translated is None:
-            if (
-                open_dropdown is not None
-                and event.type == pg.MOUSEBUTTONDOWN
-                and event.button == 1
-            ):
-                open_dropdown.close()
-
-            return
 
         if open_dropdown is not None:
             open_dropdown.handle_event(translated)

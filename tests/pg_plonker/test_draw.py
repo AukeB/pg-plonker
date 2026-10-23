@@ -23,6 +23,55 @@ def test_button_uses_config_defaults_when_no_overrides(screen: pg.Surface, font:
     assert pg.transform.average_color(screen)[:3] != (0, 0, 0)
 
 
+def test_button_pressed_does_not_move_the_button(screen: pg.Surface, font: pg.font.Font) -> None:
+    screen.fill((255, 255, 255))
+
+    draw.button(
+        surface=screen,
+        font=font,
+        x=20,
+        y=20,
+        color_background=(10, 20, 30),
+        pressed=True,
+    )
+
+    top_left_corner = screen.get_at((20 + 1, 20 + 1))
+    background_middle = screen.get_at((20 + 100, 20 + 20))
+
+    assert tuple(top_left_corner)[:3] == (0, 0, 0)
+    assert tuple(background_middle)[:3] == (10, 20, 30)
+
+
+def test_button_pressed_swaps_bevel_colors(screen: pg.Surface, font: pg.font.Font) -> None:
+    draw.button(
+        surface=screen,
+        font=font,
+        x=20,
+        y=20,
+        color_border_inner_light=(1, 1, 1),
+        color_border_inner_dark=(2, 2, 2),
+    )
+
+    unpressed_light_bevel = screen.get_at((20 + 100, 20 + 6))
+
+    screen.fill((0, 0, 0))
+
+    draw.button(
+        surface=screen,
+        font=font,
+        x=20,
+        y=20,
+        color_border_inner_light=(1, 1, 1),
+        color_border_inner_dark=(2, 2, 2),
+        pressed=True,
+    )
+
+    pressed_light_bevel = screen.get_at((20 + 100, 20 + 6))
+
+    assert tuple(unpressed_light_bevel)[:3] == (1, 1, 1)
+    assert tuple(pressed_light_bevel)[:3] == (2, 2, 2)
+
+
 # Testing the "slider" function.
 
 

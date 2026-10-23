@@ -194,15 +194,18 @@ class Button:
         # State.
         self.value = value
         self._pressed = False
+        self._pointer_inside = False
 
     def draw(self) -> None:
-        """Draw the button reflecting the current toggle state."""
+        """Draw the button reflecting the current toggle state and press state."""
 
         color_background = (
             self.color_background_active
             if self.value
             else self.color_background_inactive
         )
+
+        pressed = self._pressed and self._pointer_inside
 
         draw.button(
             surface=self.surface,
@@ -221,11 +224,16 @@ class Button:
             color_border_inner_light=self.color_border_inner_light,
             color_border_inner_dark=self.color_border_inner_dark,
             color_text_shadow=self.color_text_shadow,
+            pressed=pressed,
         )
 
     def handle_event(self, event: pg.event.Event) -> None:
-        """Toggle state on mouse release if the button was pressed down on this
-        control.
+        """Track the press, toggle state on a release over the button, and show
+        the pressed look only while the pointer is over the button.
+
+        Moving the pointer off the button while it is held removes the pressed
+        look, and moving back on restores it. The state toggles only if the
+        mouse is released over the button.
 
         Args:
             event (pg.event.Event): The pygame event to handle.
@@ -234,12 +242,17 @@ class Button:
         if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
             if self.rect.collidepoint(event.pos):
                 self._pressed = True
+                self._pointer_inside = True
+
+        if event.type == pg.MOUSEMOTION and self._pressed:
+            self._pointer_inside = self.rect.collidepoint(event.pos)
 
         if event.type == pg.MOUSEBUTTONUP and event.button == 1:
             if self._pressed and self.rect.collidepoint(event.pos):
                 self.value = not self.value
 
             self._pressed = False
+            self._pointer_inside = False
 
 
 class Slider:

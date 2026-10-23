@@ -36,6 +36,22 @@ def _mouse_up(pos: tuple[int, int]) -> pg.event.Event:
     return event
 
 
+def _mouse_motion(pos: tuple[int, int]) -> pg.event.Event:
+    """Create a mouse motion event.
+
+    Args:
+        pos (tuple[int, int]): Position the mouse moved to, in screen
+            coordinates.
+
+    Returns:
+        event (pg.event.Event): The motion event.
+    """
+
+    event = pg.event.Event(pg.MOUSEMOTION, pos=pos, rel=(0, 0), buttons=(0, 0, 0))
+
+    return event
+
+
 # Testing the "__init__" method from the "GUIPanel" class.
 
 
@@ -104,13 +120,13 @@ def test_translate_passes_through_events_without_position(screen: pg.Surface) ->
     assert translated is key_event
 
 
-def test_translate_returns_none_outside_the_panel(screen: pg.Surface) -> None:
+def test_translate_shifts_positions_outside_the_panel_too(screen: pg.Surface) -> None:
     panel = GUIPanel(surface=screen)
 
     event = _mouse_down((10, 10))
     translated = panel._translate_event_to_local(event)
 
-    assert translated is None
+    assert translated.pos == (10 - (800 - 620), 10)
 
 
 def test_translate_shifts_position_into_panel_coordinates(screen: pg.Surface) -> None:
@@ -195,6 +211,48 @@ def test_open_dropdown_takes_exclusive_events(screen: pg.Surface) -> None:
     panel.handle_event(event)
 
     assert button.value is False
+
+
+def test_release_outside_the_panel_ends_a_button_press(screen: pg.Surface) -> None:
+    panel = GUIPanel(surface=screen)
+    button = panel.add_button(text="Grid")
+    button_center = (800 - 620 + 40 + 270, 40 + 54)
+
+    panel.handle_event(_mouse_down(button_center))
+    panel.handle_event(_mouse_motion((10, 10)))
+    panel.handle_event(_mouse_up((10, 10)))
+    panel.handle_event(_mouse_motion(button_center))
+    button.draw()
+    light_bevel = screen.get_at((800 - 620 + 40 + 100, 40 + 6))
+
+    assert button.value is False
+    assert tuple(light_bevel)[:3] == (198, 198, 198)
+
+
+def test_release_outside_the_panel_ends_a_slider_drag(screen: pg.Surface) -> None:
+    panel = GUIPanel(surface=screen)
+    slider = panel.add_slider(start=0, stop=10)
+    panel_x = 800 - 620
+    handle_x, handle_y = slider._get_handle_center()
+
+    panel.handle_event(_mouse_down((panel_x + handle_x, handle_y)))
+    panel.handle_event(_mouse_up((10, 10)))
+    panel.handle_event(_mouse_motion((panel_x + slider.x + slider.width, slider.y)))
+
+    assert slider.value == 0
+
+
+def test_release_outside_the_panel_ends_a_dropdown_header_press(screen: pg.Surface) -> None:
+    panel = GUIPanel(surface=screen)
+    dropdown = panel.add_dropdown(options=["Easy", "Hard"])
+    panel_x = 800 - 620
+    header_center = (panel_x + dropdown.rect.centerx, dropdown.rect.centery)
+
+    panel.handle_event(_mouse_down(header_center))
+    panel.handle_event(_mouse_up((10, 10)))
+    panel.handle_event(_mouse_up(header_center))
+
+    assert dropdown.is_open is False
 
 
 # Testing the "draw" method from the "GUIPanel" class.

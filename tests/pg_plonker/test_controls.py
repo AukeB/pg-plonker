@@ -75,6 +75,27 @@ def test_button_draw_renders_without_error(screen: pg.Surface) -> None:
     assert pg.transform.average_color(screen)[:3] != (0, 0, 0)
 
 
+def test_button_draw_shows_bevel_pressed_while_held(screen: pg.Surface) -> None:
+    screen.fill((255, 255, 255))
+    button = Button(
+        surface=screen,
+        x=20,
+        y=20,
+        color_border_inner_light=(1, 1, 1),
+        color_border_inner_dark=(2, 2, 2),
+    )
+
+    button.draw()
+    unpressed_light_bevel = screen.get_at((20 + 100, 20 + 6))
+
+    button.handle_event(_mouse_down(button.rect.center))
+    button.draw()
+    pressed_light_bevel = screen.get_at((20 + 100, 20 + 6))
+
+    assert tuple(unpressed_light_bevel)[:3] == (1, 1, 1)
+    assert tuple(pressed_light_bevel)[:3] == (2, 2, 2)
+
+
 # Testing the "handle_event" method from the "Button" class.
 
 
@@ -129,6 +150,64 @@ def test_button_press_outside_is_not_remembered(screen: pg.Surface) -> None:
     button.handle_event(event)
 
     assert button.value is False
+
+
+def test_button_look_returns_to_unpressed_when_pointer_leaves(screen: pg.Surface) -> None:
+    screen.fill((255, 255, 255))
+    button = Button(
+        surface=screen,
+        x=20,
+        y=20,
+        color_border_inner_light=(1, 1, 1),
+        color_border_inner_dark=(2, 2, 2),
+    )
+
+    button.handle_event(_mouse_down(button.rect.center))
+    button.handle_event(_mouse_motion((900, 900)))
+    button.draw()
+    bevel_while_outside = screen.get_at((20 + 100, 20 + 6))
+
+    assert tuple(bevel_while_outside)[:3] == (1, 1, 1)
+
+
+def test_button_look_is_pressed_again_when_pointer_returns(screen: pg.Surface) -> None:
+    screen.fill((255, 255, 255))
+    button = Button(
+        surface=screen,
+        x=20,
+        y=20,
+        color_border_inner_light=(1, 1, 1),
+        color_border_inner_dark=(2, 2, 2),
+    )
+
+    button.handle_event(_mouse_down(button.rect.center))
+    button.handle_event(_mouse_motion((900, 900)))
+    button.handle_event(_mouse_motion(button.rect.center))
+    button.draw()
+    bevel_back_inside = screen.get_at((20 + 100, 20 + 6))
+
+    assert tuple(bevel_back_inside)[:3] == (2, 2, 2)
+
+
+def test_button_release_after_leaving_does_not_toggle(screen: pg.Surface) -> None:
+    button = Button(surface=screen, x=20, y=20)
+
+    button.handle_event(_mouse_down(button.rect.center))
+    button.handle_event(_mouse_motion((900, 900)))
+    button.handle_event(_mouse_up((900, 900)))
+
+    assert button.value is False
+
+
+def test_button_toggles_when_pointer_returns_before_release(screen: pg.Surface) -> None:
+    button = Button(surface=screen, x=20, y=20)
+
+    button.handle_event(_mouse_down(button.rect.center))
+    button.handle_event(_mouse_motion((900, 900)))
+    button.handle_event(_mouse_motion(button.rect.center))
+    button.handle_event(_mouse_up(button.rect.center))
+
+    assert button.value is True
 
 
 # Testing the "__init__" method from the "Slider" class.
