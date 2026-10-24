@@ -198,11 +198,11 @@ The look of every control comes from the active style. The default style is `emb
 
 Available styles:
 
-- `"chalk"`: dark slate panel with sand-coloured buttons, a gold on state with dark text, and rounded corners. Its values are defined in `src/pg_plonker/styles/chalk.py`.
-- `"embossed"` (default): raised 3D controls with light and dark bevels. Its values are defined in `src/pg_plonker/styles/embossed.py`.
-- `"flat"`: no borders or bevels, and no hover or press effects. Its values are defined in `src/pg_plonker/styles/flat.py`.
-- `"terminal"`: monospace text, green on black, with green borders. Its values are defined in `src/pg_plonker/styles/terminal.py`.
-- `"soft"`: light pastel colours, subtle text shadows and gentle hover. Its values are defined in `src/pg_plonker/styles/soft.py`.
+- `"embossed"` (default): raised 3D controls with light and dark bevels.
+- `"flat"`: no borders or bevels, and no hover or press effects.
+- `"soft"`: light pastel colours, subtle text shadows and gentle hover.
+- `"terminal"`: monospace text, green on black, with green borders.
+- `"chalk"`: dark slate panel with sand-coloured buttons, a gold on state with dark text, and rounded corners.
 
 Every control and draw function reads the active style, so a call to `set_style()` changes all of them:
 
@@ -212,7 +212,7 @@ import pg_plonker as pgp
 pgp.set_style("embossed")
 ```
 
-Each style sets every value in the `Style` dataclass and its element groups, so a style is always complete. Passing a value to a constructor, such as `Button(..., color_text=(0, 0, 0))`, overrides the style for that control. Arguments left out follow the active style.
+Each style sets every value in the `Style` dataclass and its element groups, so a style is always complete. Passing a value to a constructor, such as `Button(..., color_text=(0, 0, 0))`, overrides the style for that control, for as long as the control exists. Calling `set_style()` does not change it. Arguments left out follow the active style, so they change when the style does.
 
 Layout options such as the panel's `width`, `margin_gui_panel`, `margin_button` and `align_right` are plain arguments of `GUIPanel`, not part of a style.
 

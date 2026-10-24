@@ -73,10 +73,8 @@ See `docs/style_design.md` for the full design.
 - [x] Implement `"terminal"` style — monospace font (`SysFont` with common monospace names), green on black.
 - [x] Implement `"soft"` style — light pastel colours, subtle shadows.
 - [x] Implement `set_style()` and the style registry. It sets the active global style, which applies to all controls and draw calls, including ones created before the call.
-- [ ] Controls, draw functions and `GUIPanel` read the active style at draw and event time. Explicit arguments given at construction override it until the next `set_style()` call.
-  - Done: controls, draw functions and `GUIPanel` read the active style at draw time, so an existing control follows a later `set_style()` call.
-  - Not done: explicit overrides are not yet dropped when `set_style()` is called. Doing so needs a registry of live controls.
-- [ ] Tests: every style sets every field, and an unknown style name raises `StyleNotFoundError`. (The shape, `embossed` and the unknown-name error are tested. Per-style checks come with each new style.)
+- [x] Controls, draw functions and `GUIPanel` read the active style at draw and event time. Explicit arguments given at construction are permanent overrides for that control, while `set_style()` changes every other setting.
+- [x] Tests: every style sets every field, and an unknown style name raises `StyleNotFoundError`. Checks over every registered style run automatically, so new styles are covered.
 
 ## 4. Layout mode system (`set_mode`)
 
