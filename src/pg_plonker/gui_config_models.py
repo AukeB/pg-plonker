@@ -34,6 +34,8 @@ class ButtonConfig:
         text_shadow_offset (int): Default 3.
         color_background_active (RGBColor): Default (200, 150, 150).
         color_background_inactive (RGBColor): Default (150, 150, 150).
+        hover_lighten (float): Default 0.15. Fraction of the distance to white
+            the color moves while hovered.
         color_text (RGBColor): Default (255, 255, 255).
         color_border (RGBColor): Default (0, 0, 0).
         color_border_inner_light (RGBColor): Default (198, 198, 198).
@@ -56,6 +58,7 @@ class ButtonConfig:
     # Color settings.
     color_background_active: RGBColor = (200, 150, 150)
     color_background_inactive: RGBColor = (150, 150, 150)
+    hover_lighten: float = 0.15
     color_text: RGBColor = (255, 255, 255)
     color_border: RGBColor = (0, 0, 0)
     color_border_inner_light: RGBColor = (198, 198, 198)
@@ -84,6 +87,8 @@ class SliderConfig:
         color_track (RGBColor): Default (150, 150, 150).
         color_track_filled (RGBColor): Default (200, 150, 150).
         color_handle (RGBColor): Default (230, 230, 230).
+        hover_lighten (float): Default 0.15. Fraction of the distance to white
+            the color moves while hovered.
         color_border (RGBColor): Default (0, 0, 0).
         color_text (RGBColor): Default (0, 0, 0).
     """
@@ -108,6 +113,7 @@ class SliderConfig:
     color_track: RGBColor = (150, 150, 150)
     color_track_filled: RGBColor = (200, 150, 150)
     color_handle: RGBColor = (230, 230, 230)
+    hover_lighten: float = 0.15
     color_border: RGBColor = (0, 0, 0)
     color_text: RGBColor = (0, 0, 0)
 
@@ -135,6 +141,8 @@ class DropdownConfig:
         text_padding (int): Default 12.
         color_background_active (RGBColor): Default (200, 150, 150).
         color_background_inactive (RGBColor): Default (150, 150, 150).
+        hover_lighten (float): Default 0.15. Fraction of the distance to white
+            the color moves while hovered.
         color_background_option (RGBColor): Default (170, 170, 170).
         color_background_option_hover (RGBColor): Default (200, 150, 150).
         color_text (RGBColor): Default (255, 255, 255).
@@ -162,6 +170,7 @@ class DropdownConfig:
     # Color settings.
     color_background_active: RGBColor = (200, 150, 150)
     color_background_inactive: RGBColor = (150, 150, 150)
+    hover_lighten: float = 0.15
     color_background_option: RGBColor = (170, 170, 170)
     color_background_option_hover: RGBColor = (200, 150, 150)
     color_text: RGBColor = (255, 255, 255)

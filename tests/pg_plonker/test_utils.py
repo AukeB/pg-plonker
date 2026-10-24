@@ -8,6 +8,7 @@ import pytest
 from pg_plonker.utils import (
     count_decimal_places,
     get_window_size_from_screen_resolution,
+    lighten_color,
 )
 
 # Testing the "get_window_size_from_screen_resolution" function.
@@ -29,7 +30,9 @@ def test_window_size_clamps_to_minimum(monkeypatch: pytest.MonkeyPatch) -> None:
     assert window_size == (400, 300)
 
 
-def test_window_size_initializes_display_when_needed(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_window_size_initializes_display_when_needed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     initialized: list[bool] = []
     monkeypatch.setattr(pg.display, "get_init", lambda: False)
 
@@ -53,3 +56,18 @@ def test_window_size_initializes_display_when_needed(monkeypatch: pytest.MonkeyP
 )
 def test_count_decimal_places_counts_shortest_form(value: float, expected: int) -> None:
     assert count_decimal_places(value) == expected
+
+
+# Testing the "lighten_color" function.
+
+
+def test_lighten_color_moves_each_channel_toward_white() -> None:
+    assert lighten_color((100, 100, 100), 0.2) == (131, 131, 131)
+
+
+def test_lighten_color_keeps_white_white() -> None:
+    assert lighten_color((255, 255, 255), 0.5) == (255, 255, 255)
+
+
+def test_lighten_color_with_zero_ratio_returns_the_color() -> None:
+    assert lighten_color((10, 20, 30), 0) == (10, 20, 30)

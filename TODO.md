@@ -56,10 +56,7 @@ Planned work for pg-plonker, sorted by priority (highest first). See `README.md`
 
 - [x] Add a "pressed" visual variant to `draw.button` (e.g. depressed border effect).
 - [x] Trigger the pressed visual on `MOUSEBUTTONDOWN`, revert on `MOUSEBUTTONUP` or pointer leave.
-- [ ] Add a hover state visual (highlight on mouse-over, before a click).
-- [ ] Pick or source a click sound effect asset.
-- [ ] Play the sound on toggle inside `Button.handle_event`.
-- [ ] Add a way to mute/disable sound globally.
+- [x] Add a hover state visual (highlight on mouse-over, before a click).
 
 ## 3. Style system (`set_style`)
 
@@ -104,3 +101,6 @@ Planned work for pg-plonker, sorted by priority (highest first). See `README.md`
 ### Nice to have
 
 - [ ] Keyboard support: a focus system in `GUIPanel` (Tab/Shift+Tab with a focus indicator), Space/Enter to toggle a focused `Button`, arrow keys to step a `Slider`, and Enter/Space to open, arrow keys to move, Enter to select and Escape to close a `Dropdown`.
+- [ ] Pick or source a click sound effect asset.
+- [ ] Play the sound on toggle inside `Button.handle_event`.
+- [ ] Add a way to mute/disable sound globally.

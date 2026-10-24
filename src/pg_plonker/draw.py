@@ -16,6 +16,7 @@ from pg_plonker.gui_config_models import (
     RGBColor,
     SliderConfig,
 )
+from pg_plonker.utils import lighten_color
 
 _config_button = ButtonConfig()
 _config_slider = SliderConfig()
@@ -40,6 +41,8 @@ def button(
     color_border_inner_dark: RGBColor | None = None,
     color_text_shadow: RGBColor | None = None,
     pressed: bool = False,
+    hover_lighten: float | None = None,
+    hovered: bool = False,
 ) -> None:
     """Draw a single button onto the given surface.
 
@@ -79,6 +82,10 @@ def button(
         color_text_shadow (RGBColor | None): Text shadow color, overrides config
             if provided.
         pressed (bool): Whether the button is held down. Defaults to False.
+        hover_lighten (float | None): Fraction of the distance to white the
+            background moves while hovered, overrides config if provided.
+        hovered (bool): Whether the pointer is over the button. Defaults to
+            False.
     """
 
     # Get all arguments, either from function input or config.
@@ -107,6 +114,13 @@ def button(
         if color_background is not None
         else _config_button.color_background_inactive
     )
+
+    hover_lighten = (
+        hover_lighten if hover_lighten is not None else _config_button.hover_lighten
+    )
+
+    if hovered:
+        color_background = lighten_color(color_background, hover_lighten)
 
     color_text = color_text if color_text is not None else _config_button.color_text
 
@@ -214,6 +228,8 @@ def slider(
     color_handle: RGBColor | None = None,
     color_border: RGBColor | None = None,
     color_text: RGBColor | None = None,
+    hover_lighten: float | None = None,
+    hovered: bool = False,
 ) -> None:
     """Draw a single horizontal slider onto the given surface.
 
@@ -250,6 +266,10 @@ def slider(
             provided.
         color_text (RGBColor | None): Value readout text color, overrides config
             if provided.
+        hover_lighten (float | None): Fraction of the distance to white the
+            handle moves while hovered, overrides config if provided.
+        hovered (bool): Whether the pointer is over the handle. Defaults to
+            False.
     """
 
     # Get all arguments, either from function input or config.
@@ -275,6 +295,13 @@ def slider(
     color_handle = (
         color_handle if color_handle is not None else _config_slider.color_handle
     )
+
+    hover_lighten = (
+        hover_lighten if hover_lighten is not None else _config_slider.hover_lighten
+    )
+
+    if hovered:
+        color_handle = lighten_color(color_handle, hover_lighten)
 
     color_border = (
         color_border if color_border is not None else _config_slider.color_border
@@ -326,6 +353,8 @@ def dropdown_header(
     color_border_inner_dark: RGBColor | None = None,
     color_text_shadow: RGBColor | None = None,
     color_arrow: RGBColor | None = None,
+    hover_lighten: float | None = None,
+    hovered: bool = False,
 ) -> None:
     """Draw a single dropdown header onto the given surface.
 
@@ -375,6 +404,11 @@ def dropdown_header(
             if provided.
         color_arrow (RGBColor | None): Arrow indicator color, overrides config
             if provided.
+        hover_lighten (float | None): Fraction of the distance to white the
+            header background moves while hovered and closed, overrides config
+            if provided.
+        hovered (bool): Whether the pointer is over the header. Defaults to
+            False.
     """
 
     # Get all arguments, either from function input or config.
@@ -412,6 +446,13 @@ def dropdown_header(
             else _config_dropdown.color_background_inactive
         )
     )
+
+    hover_lighten = (
+        hover_lighten if hover_lighten is not None else _config_dropdown.hover_lighten
+    )
+
+    if hovered and not is_open:
+        color_background = lighten_color(color_background, hover_lighten)
 
     color_text = color_text if color_text is not None else _config_dropdown.color_text
 

@@ -152,7 +152,9 @@ def test_button_press_outside_is_not_remembered(screen: pg.Surface) -> None:
     assert button.value is False
 
 
-def test_button_look_returns_to_unpressed_when_pointer_leaves(screen: pg.Surface) -> None:
+def test_button_look_returns_to_unpressed_when_pointer_leaves(
+    screen: pg.Surface,
+) -> None:
     screen.fill((255, 255, 255))
     button = Button(
         surface=screen,
@@ -197,6 +199,52 @@ def test_button_release_after_leaving_does_not_toggle(screen: pg.Surface) -> Non
     button.handle_event(_mouse_up((900, 900)))
 
     assert button.value is False
+
+
+def test_button_hover_lightens_the_inactive_color_while_pointer_is_over(
+    screen: pg.Surface,
+) -> None:
+    screen.fill((255, 255, 255))
+    button = Button(
+        surface=screen, x=20, y=20, color_background_inactive=(100, 100, 100)
+    )
+
+    button.handle_event(_mouse_motion(button.rect.center))
+    button.draw()
+    background_while_hovered = screen.get_at((20 + 100, 20 + 20))
+
+    assert tuple(background_while_hovered)[:3] == (123, 123, 123)
+
+
+def test_button_hover_lightens_the_active_color_when_on(screen: pg.Surface) -> None:
+    screen.fill((255, 255, 255))
+    button = Button(
+        surface=screen,
+        x=20,
+        y=20,
+        color_background_active=(100, 100, 100),
+        value=True,
+    )
+
+    button.handle_event(_mouse_motion(button.rect.center))
+    button.draw()
+    background_while_hovered = screen.get_at((20 + 100, 20 + 20))
+
+    assert tuple(background_while_hovered)[:3] == (123, 123, 123)
+
+
+def test_button_hover_ends_when_pointer_leaves(screen: pg.Surface) -> None:
+    screen.fill((255, 255, 255))
+    button = Button(
+        surface=screen, x=20, y=20, color_background_inactive=(100, 100, 100)
+    )
+
+    button.handle_event(_mouse_motion(button.rect.center))
+    button.handle_event(_mouse_motion((900, 900)))
+    button.draw()
+    background_after_leaving = screen.get_at((20 + 100, 20 + 20))
+
+    assert tuple(background_after_leaving)[:3] == (100, 100, 100)
 
 
 def test_button_toggles_when_pointer_returns_before_release(screen: pg.Surface) -> None:
@@ -270,11 +318,56 @@ def test_value_from_x_snaps_to_step(screen: pg.Surface) -> None:
 
 
 def test_slider_draw_renders_with_value_readout(screen: pg.Surface) -> None:
-    slider = Slider(surface=screen, x=20, y=40, start=0, stop=10, value=4, show_value=True)
+    slider = Slider(
+        surface=screen, x=20, y=40, start=0, stop=10, value=4, show_value=True
+    )
 
     slider.draw()
 
     assert pg.transform.average_color(screen)[:3] != (0, 0, 0)
+
+
+def test_slider_handle_lightens_while_pointer_is_over_handle(
+    screen: pg.Surface,
+) -> None:
+    screen.fill((255, 255, 255))
+    slider = Slider(
+        surface=screen,
+        x=20,
+        y=40,
+        start=0,
+        stop=10,
+        value=5,
+        color_handle=(100, 100, 100),
+    )
+    handle_center = slider._get_handle_center()
+
+    slider.handle_event(_mouse_motion(handle_center))
+    slider.draw()
+    handle_while_hovered = screen.get_at(handle_center)
+
+    assert tuple(handle_while_hovered)[:3] == (123, 123, 123)
+
+
+def test_slider_handle_hover_ends_when_pointer_leaves(screen: pg.Surface) -> None:
+    screen.fill((255, 255, 255))
+    slider = Slider(
+        surface=screen,
+        x=20,
+        y=40,
+        start=0,
+        stop=10,
+        value=5,
+        color_handle=(100, 100, 100),
+    )
+    handle_center = slider._get_handle_center()
+
+    slider.handle_event(_mouse_motion(handle_center))
+    slider.handle_event(_mouse_motion((900, 900)))
+    slider.draw()
+    handle_after_leaving = screen.get_at(handle_center)
+
+    assert tuple(handle_after_leaving)[:3] == (100, 100, 100)
 
 
 # Testing the "handle_event" method from the "Slider" class.
@@ -390,6 +483,41 @@ def test_dropdown_draw_renders_header(screen: pg.Surface) -> None:
     dropdown.draw()
 
     assert pg.transform.average_color(screen)[:3] != (0, 0, 0)
+
+
+def test_dropdown_header_lightens_while_pointer_is_over(screen: pg.Surface) -> None:
+    screen.fill((255, 255, 255))
+    dropdown = Dropdown(
+        surface=screen,
+        x=20,
+        y=20,
+        options=["Easy", "Hard"],
+        color_background_inactive=(100, 100, 100),
+    )
+
+    dropdown.handle_event(_mouse_motion(dropdown.rect.center))
+    dropdown.draw()
+    header_while_hovered = screen.get_at((dropdown.rect.centerx, dropdown.rect.y + 20))
+
+    assert tuple(header_while_hovered)[:3] == (123, 123, 123)
+
+
+def test_dropdown_header_hover_ends_when_pointer_leaves(screen: pg.Surface) -> None:
+    screen.fill((255, 255, 255))
+    dropdown = Dropdown(
+        surface=screen,
+        x=20,
+        y=20,
+        options=["Easy", "Hard"],
+        color_background_inactive=(100, 100, 100),
+    )
+
+    dropdown.handle_event(_mouse_motion(dropdown.rect.center))
+    dropdown.handle_event(_mouse_motion((900, 900)))
+    dropdown.draw()
+    header_after_leaving = screen.get_at((dropdown.rect.centerx, dropdown.rect.y + 20))
+
+    assert tuple(header_after_leaving)[:3] == (100, 100, 100)
 
 
 # Testing the "draw_options" method from the "Dropdown" class.

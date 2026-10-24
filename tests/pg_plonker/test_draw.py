@@ -7,23 +7,47 @@ from pg_plonker import draw
 # Testing the "button" function.
 
 
-def test_button_fills_background_with_given_color(screen: pg.Surface, font: pg.font.Font) -> None:
-    draw.button(surface=screen,
-        font=font, x=20, y=20, color_background=(10, 20, 30))
+def test_button_fills_background_with_given_color(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
+    draw.button(surface=screen, font=font, x=20, y=20, color_background=(10, 20, 30))
 
     pixel = screen.get_at((20 + 540 - 30, 20 + 54))
 
     assert tuple(pixel)[:3] == (10, 20, 30)
 
 
-def test_button_uses_config_defaults_when_no_overrides(screen: pg.Surface, font: pg.font.Font) -> None:
-    draw.button(surface=screen,
-        font=font, x=20, y=20)
+def test_button_uses_config_defaults_when_no_overrides(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
+    draw.button(surface=screen, font=font, x=20, y=20)
 
     assert pg.transform.average_color(screen)[:3] != (0, 0, 0)
 
 
-def test_button_pressed_does_not_move_the_button(screen: pg.Surface, font: pg.font.Font) -> None:
+def test_button_hovered_lightens_background(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
+    screen.fill((255, 255, 255))
+
+    draw.button(
+        surface=screen,
+        font=font,
+        x=20,
+        y=20,
+        color_background=(100, 100, 100),
+        hover_lighten=0.2,
+        hovered=True,
+    )
+
+    background = screen.get_at((20 + 100, 20 + 20))
+
+    assert tuple(background)[:3] == (131, 131, 131)
+
+
+def test_button_pressed_does_not_move_the_button(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
     screen.fill((255, 255, 255))
 
     draw.button(
@@ -42,7 +66,9 @@ def test_button_pressed_does_not_move_the_button(screen: pg.Surface, font: pg.fo
     assert tuple(background_middle)[:3] == (10, 20, 30)
 
 
-def test_button_pressed_swaps_bevel_colors(screen: pg.Surface, font: pg.font.Font) -> None:
+def test_button_pressed_swaps_bevel_colors(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
     draw.button(
         surface=screen,
         font=font,
@@ -75,7 +101,9 @@ def test_button_pressed_swaps_bevel_colors(screen: pg.Surface, font: pg.font.Fon
 # Testing the "slider" function.
 
 
-def test_slider_draws_the_filled_part_up_to_the_handle(screen: pg.Surface, font: pg.font.Font) -> None:
+def test_slider_draws_the_filled_part_up_to_the_handle(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
     draw.slider(
         surface=screen,
         font=font,
@@ -93,9 +121,20 @@ def test_slider_draws_the_filled_part_up_to_the_handle(screen: pg.Surface, font:
     assert tuple(pixel)[:3] == (200, 10, 10)
 
 
-def test_slider_shows_value_when_requested(screen: pg.Surface, font: pg.font.Font) -> None:
-    draw.slider(surface=screen,
-        font=font, x=20, y=100, start=0, stop=10, value=3.5, precision=2, show_value=True)
+def test_slider_shows_value_when_requested(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
+    draw.slider(
+        surface=screen,
+        font=font,
+        x=20,
+        y=100,
+        start=0,
+        stop=10,
+        value=3.5,
+        precision=2,
+        show_value=True,
+    )
 
     assert pg.transform.average_color(screen)[:3] != (0, 0, 0)
 
@@ -103,16 +142,44 @@ def test_slider_shows_value_when_requested(screen: pg.Surface, font: pg.font.Fon
 # Testing the "dropdown_header" function.
 
 
-def test_dropdown_header_draws_closed_and_open_states(screen: pg.Surface, font: pg.font.Font) -> None:
-    draw.dropdown_header(surface=screen,
-        font=font, x=20, y=20, text="Easy", is_open=False)
+def test_slider_handle_hovered_lightens_handle(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
+    screen.fill((255, 255, 255))
+
+    draw.slider(
+        surface=screen,
+        font=font,
+        x=20,
+        y=100,
+        start=0,
+        stop=10,
+        value=5,
+        precision=1,
+        color_handle=(100, 100, 100),
+        hover_lighten=0.2,
+        hovered=True,
+    )
+
+    handle = screen.get_at((20 + 270, 100))
+
+    assert tuple(handle)[:3] == (131, 131, 131)
+
+
+def test_dropdown_header_draws_closed_and_open_states(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
+    draw.dropdown_header(
+        surface=screen, font=font, x=20, y=20, text="Easy", is_open=False
+    )
 
     closed_average = pg.transform.average_color(screen)[:3]
 
     screen.fill((0, 0, 0))
 
-    draw.dropdown_header(surface=screen,
-        font=font, x=20, y=20, text="Easy", is_open=True)
+    draw.dropdown_header(
+        surface=screen, font=font, x=20, y=20, text="Easy", is_open=True
+    )
 
     open_average = pg.transform.average_color(screen)[:3]
 
@@ -120,10 +187,34 @@ def test_dropdown_header_draws_closed_and_open_states(screen: pg.Surface, font: 
     assert open_average != (0, 0, 0)
 
 
+def test_dropdown_header_hovered_lightens_background(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
+    screen.fill((255, 255, 255))
+
+    draw.dropdown_header(
+        surface=screen,
+        font=font,
+        x=20,
+        y=20,
+        text="Easy",
+        is_open=False,
+        color_background=(100, 100, 100),
+        hover_lighten=0.2,
+        hovered=True,
+    )
+
+    background = screen.get_at((20 + 270, 20 + 20))
+
+    assert tuple(background)[:3] == (131, 131, 131)
+
+
 # Testing the "dropdown_options" function.
 
 
-def test_dropdown_options_paints_the_hovered_row(screen: pg.Surface, font: pg.font.Font) -> None:
+def test_dropdown_options_paints_the_hovered_row(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
     draw.dropdown_options(
         surface=screen,
         font=font,
@@ -139,7 +230,9 @@ def test_dropdown_options_paints_the_hovered_row(screen: pg.Surface, font: pg.fo
     assert tuple(pixel)[:3] == (5, 6, 7)
 
 
-def test_dropdown_options_without_hover_uses_default_color(screen: pg.Surface, font: pg.font.Font) -> None:
+def test_dropdown_options_without_hover_uses_default_color(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
     draw.dropdown_options(
         surface=screen,
         font=font,
@@ -155,7 +248,9 @@ def test_dropdown_options_without_hover_uses_default_color(screen: pg.Surface, f
     assert tuple(pixel)[:3] == (8, 9, 10)
 
 
-def test_dropdown_options_separator_is_border_width_thick(screen: pg.Surface, font: pg.font.Font) -> None:
+def test_dropdown_options_separator_is_border_width_thick(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
     draw.dropdown_options(
         surface=screen,
         font=font,
@@ -181,7 +276,9 @@ def test_dropdown_options_separator_is_border_width_thick(screen: pg.Surface, fo
     assert tuple(below_separator)[:3] == (8, 9, 10)
 
 
-def test_dropdown_options_outer_border_is_border_width_thick(screen: pg.Surface, font: pg.font.Font) -> None:
+def test_dropdown_options_outer_border_is_border_width_thick(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
     draw.dropdown_options(
         surface=screen,
         font=font,
@@ -203,7 +300,9 @@ def test_dropdown_options_outer_border_is_border_width_thick(screen: pg.Surface,
     assert tuple(inside_left_edge)[:3] == (8, 9, 10)
 
 
-def test_dropdown_options_top_border_overlaps_header_bottom_border(screen: pg.Surface, font: pg.font.Font) -> None:
+def test_dropdown_options_top_border_overlaps_header_bottom_border(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
     draw.dropdown_options(
         surface=screen,
         font=font,

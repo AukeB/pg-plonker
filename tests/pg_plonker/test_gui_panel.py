@@ -92,7 +92,10 @@ def test_add_slider_reserves_vertical_margins(screen: pg.Surface) -> None:
     slider = panel.add_slider(start=0, stop=10, value=5)
 
     assert slider.y == 40 + slider.margin_vertical + slider.rect.height // 2
-    assert panel._next_control_y == 40 + slider.margin_vertical * 2 + slider.rect.height + 24
+    assert (
+        panel._next_control_y
+        == 40 + slider.margin_vertical * 2 + slider.rect.height + 24
+    )
 
 
 # Testing the "add_dropdown" method from the "GUIPanel" class.
@@ -242,7 +245,9 @@ def test_release_outside_the_panel_ends_a_slider_drag(screen: pg.Surface) -> Non
     assert slider.value == 0
 
 
-def test_release_outside_the_panel_ends_a_dropdown_header_press(screen: pg.Surface) -> None:
+def test_release_outside_the_panel_ends_a_dropdown_header_press(
+    screen: pg.Surface,
+) -> None:
     panel = GUIPanel(surface=screen)
     dropdown = panel.add_dropdown(options=["Easy", "Hard"])
     panel_x = 800 - 620

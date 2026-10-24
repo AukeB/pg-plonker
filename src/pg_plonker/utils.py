@@ -5,6 +5,7 @@ Functions:
   resolution.
 - count_decimal_places: Count the decimal digits in a number's shortest string
   form.
+- lighten_color: Move an RGB color a given fraction of the way toward white.
 """
 
 from decimal import Decimal
@@ -12,6 +13,7 @@ from decimal import Decimal
 import pygame as pg
 
 from pg_plonker.constants import WINDOW_SIZE_SCREEN_FRACTION
+from pg_plonker.gui_config_models import RGBColor
 
 
 def get_window_size_from_screen_resolution(
@@ -75,3 +77,28 @@ def count_decimal_places(value: int | float) -> int:
     decimal_places = max(-exponent, 0) if isinstance(exponent, int) else 0
 
     return decimal_places
+
+
+def lighten_color(color: RGBColor, ratio: float) -> RGBColor:
+    """Move an RGB color a fraction of the way toward white.
+
+    Each channel moves ratio of the distance to 255, so a ratio of 0 returns the
+    color unchanged and a ratio of 1 returns white. Used to derive a hover color
+    from whatever color a control is currently showing.
+
+    Args:
+        color (RGBColor): The color to lighten.
+        ratio (float): Fraction of the distance to white to move, from 0 to 1.
+
+    Returns:
+        lightened (RGBColor): The lightened color.
+    """
+
+    red, green, blue = color
+    lightened = (
+        round(red + (255 - red) * ratio),
+        round(green + (255 - green) * ratio),
+        round(blue + (255 - blue) * ratio),
+    )
+
+    return lightened

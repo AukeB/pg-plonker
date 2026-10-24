@@ -14,7 +14,9 @@ from pg_plonker.gui_config_models import (
 # Testing the default values of the config dataclasses.
 
 
-@pytest.mark.parametrize("config_class", [ButtonConfig, SliderConfig, DropdownConfig, GUIPanelConfig])
+@pytest.mark.parametrize(
+    "config_class", [ButtonConfig, SliderConfig, DropdownConfig, GUIPanelConfig]
+)
 def test_config_defaults_are_frozen(config_class: type) -> None:
     config = config_class()
 

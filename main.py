@@ -39,6 +39,8 @@ def main() -> None:
         "Level 1",
         "Level 2"
     ])
+    slider_2 = panel.add_slider(start=0, stop=10)
+
 
     #button = Button(surface=screen, x=100, y=100)
     #slider = Slider(surface=screen, x=100, y=300, start=0, stop=10, show_value=True)

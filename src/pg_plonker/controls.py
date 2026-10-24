@@ -195,6 +195,7 @@ class Button:
         self.value = value
         self._pressed = False
         self._pointer_inside = False
+        self._hovered = False
 
     def draw(self) -> None:
         """Draw the button reflecting the current toggle state and press state."""
@@ -208,6 +209,7 @@ class Button:
         pressed = self._pressed and self._pointer_inside
 
         draw.button(
+            hovered=self._hovered,
             surface=self.surface,
             x=self.x,
             y=self.y,
@@ -244,8 +246,11 @@ class Button:
                 self._pressed = True
                 self._pointer_inside = True
 
-        if event.type == pg.MOUSEMOTION and self._pressed:
-            self._pointer_inside = self.rect.collidepoint(event.pos)
+        if event.type == pg.MOUSEMOTION:
+            self._hovered = self.rect.collidepoint(event.pos)
+
+            if self._pressed:
+                self._pointer_inside = self._hovered
 
         if event.type == pg.MOUSEBUTTONUP and event.button == 1:
             if self._pressed and self.rect.collidepoint(event.pos):
@@ -432,6 +437,7 @@ class Slider:
         # State.
         self.value = round(value if value is not None else self.start, self._precision)
         self._dragging = False
+        self._hovered = False
 
     def _get_handle_center(self) -> tuple[int, int]:
         """Compute the current pixel center of the handle from self.value.
@@ -500,6 +506,7 @@ class Slider:
             color_track=self.color_track,
             color_track_filled=self.color_track_filled,
             color_handle=self.color_handle,
+            hovered=self._hovered,
             color_border=self.color_border,
             color_text=self.color_text,
         )
@@ -533,6 +540,9 @@ class Slider:
             ):
                 self._dragging = True
                 self.value = self._get_value_from_x(event.pos[0])
+
+        if event.type == pg.MOUSEMOTION:
+            self._hovered = handle_rect.collidepoint(event.pos)
 
         if event.type == pg.MOUSEMOTION and self._dragging:
             self.value = self._get_value_from_x(event.pos[0])
@@ -731,6 +741,7 @@ class Dropdown:
         self.is_open = False
         self._pressed = False
         self._hovered_index: int | None = None
+        self._header_hovered = False
 
     def _get_options_rect(self) -> pg.Rect:
         """Compute the bounding rect of the open option list.
@@ -790,6 +801,7 @@ class Dropdown:
                 if self.is_open
                 else self.color_background_inactive
             ),
+            hovered=self._header_hovered,
             color_text=self.color_text,
             color_border=self.color_border,
             color_border_inner_light=self.color_border_inner_light,
@@ -838,6 +850,9 @@ class Dropdown:
         Args:
             event (pg.event.Event): The pygame event to handle.
         """
+
+        if event.type == pg.MOUSEMOTION:
+            self._header_hovered = self.rect.collidepoint(event.pos)
 
         if self.is_open:
             options_rect = self._get_options_rect()
