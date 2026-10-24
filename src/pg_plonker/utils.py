@@ -13,7 +13,7 @@ from decimal import Decimal
 import pygame as pg
 
 from pg_plonker.constants import WINDOW_SIZE_SCREEN_FRACTION
-from pg_plonker.gui_config_models import RGBColor
+from pg_plonker.styles.models import RGBColor
 
 
 def get_window_size_from_screen_resolution(
@@ -57,6 +57,12 @@ def get_window_size_from_screen_resolution(
 
 def count_decimal_places(value: int | float) -> int:
     """Count the number of decimal digits in a number's shortest string form.
+
+    Used by `Slider._precision` to work out how many decimal places a slider's
+    values should be rounded to, from its start, stop and step. Without this, a
+    slider with start=0, stop=10, step=0.25 would need the user to pass the
+    precision by hand, and dragged values would show floating-point noise such
+    as 2.4999999999999996 instead of 2.5.
 
     Counting is done via Decimal(str(value)) rather than inspecting the raw
     float directly, since binary floating-point numbers do not store decimal
@@ -102,3 +108,19 @@ def lighten_color(color: RGBColor, ratio: float) -> RGBColor:
     )
 
     return lightened
+
+
+def resolve_override[T](override: T | None, fallback: T) -> T:
+    """Return the override when one was given, otherwise the fallback.
+
+    Args:
+        override (T | None): The value passed to a constructor, or None.
+        fallback (T): The value from the active style.
+
+    Returns:
+        value (T): The override if it is not None, otherwise the fallback.
+    """
+
+    value = override if override is not None else fallback
+
+    return value
