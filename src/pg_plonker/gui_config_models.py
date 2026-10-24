@@ -110,7 +110,7 @@ class SliderConfig:
     extra_decimal_places: int = 2
 
     # Color settings.
-    color_track: RGBColor = (150, 150, 150)
+    color_track: RGBColor = (0, 150, 150)
     color_track_filled: RGBColor = (200, 150, 150)
     color_handle: RGBColor = (230, 230, 230)
     hover_lighten: float = 0.15
