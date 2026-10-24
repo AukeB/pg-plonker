@@ -23,6 +23,30 @@ _READOUT_GAP = 4
 _LABEL_GAP = 12
 
 
+def _corner_radius(corner_radius: int | None) -> int:
+    """Return the corner radius to draw with.
+
+    Args:
+        corner_radius (int | None): An explicit radius, or None to follow the
+            active style.
+
+    Returns:
+        radius (int): The explicit radius if given. Otherwise the style's radius
+            when the style is rounded, or 0 for square corners.
+    """
+
+    style = get_style()
+
+    if corner_radius is not None:
+        radius = corner_radius
+    elif style.rounded:
+        radius = style.corner_radius
+    else:
+        radius = 0
+
+    return radius
+
+
 def _draw_bevelled_box(
     surface: Surface,
     rect: pg.Rect,
@@ -32,6 +56,7 @@ def _draw_bevelled_box(
     color_border_inner_light: RGBColor,
     color_border_inner_dark: RGBColor,
     border_width_inner: int,
+    corner_radius: int = 0,
 ) -> None:
     """Draw a filled rectangle with an outer border and light/dark inner bevel.
 
@@ -46,11 +71,14 @@ def _draw_bevelled_box(
         color_border_inner_light (RGBColor): Light bevel colour.
         color_border_inner_dark (RGBColor): Dark bevel colour.
         border_width_inner (int): Inner bevel thickness.
+        corner_radius (int): Corner radius in pixels, 0 for square corners.
     """
 
-    pg.draw.rect(surface, color_background, rect)
+    pg.draw.rect(surface, color_background, rect, border_radius=corner_radius)
     if border_width > 0:
-        pg.draw.rect(surface, color_border, rect, border_width)
+        pg.draw.rect(
+            surface, color_border, rect, border_width, border_radius=corner_radius
+        )
 
     inner_rect = rect.inflate(-border_width * 2, -border_width * 2)
     pg.draw.line(
@@ -103,6 +131,7 @@ def button(
     pressed: bool = False,
     hover_lighten: float | None = None,
     hovered: bool = False,
+    corner_radius: int | None = None,
 ) -> None:
     """Draw a single button onto the given surface.
 
@@ -214,6 +243,8 @@ def button(
     if pressed:
         color_bevel_light, color_bevel_dark = color_bevel_dark, color_bevel_light
 
+    corner_radius = _corner_radius(corner_radius)
+
     # Drawing operations.
     _draw_bevelled_box(
         surface,
@@ -224,6 +255,7 @@ def button(
         color_bevel_light,
         color_bevel_dark,
         border_width_inner,
+        corner_radius,
     )
 
     shadow_surface = font.render(text, True, color_text_shadow)
@@ -319,6 +351,7 @@ def slider(
     color_box_border: RGBColor | None = None,
     color_box_border_inner_light: RGBColor | None = None,
     color_box_border_inner_dark: RGBColor | None = None,
+    corner_radius: int | None = None,
 ) -> None:
     """Draw a single horizontal slider inside a bevelled box.
 
@@ -458,6 +491,9 @@ def slider(
     track_rect = pg.Rect(x, y - height // 2, width, height)
     track_filled_rect = pg.Rect(x, y - height // 2, handle_x - x, height)
 
+    corner_radius = _corner_radius(corner_radius)
+    track_radius = min(corner_radius, height // 2)
+
     # Drawing operations.
     _draw_bevelled_box(
         surface,
@@ -468,9 +504,12 @@ def slider(
         color_box_border_inner_light,
         color_box_border_inner_dark,
         box_border_width_inner,
+        corner_radius,
     )
-    pg.draw.rect(surface, color_track, track_rect)
-    pg.draw.rect(surface, color_track_filled, track_filled_rect)
+    pg.draw.rect(surface, color_track, track_rect, border_radius=track_radius)
+    pg.draw.rect(
+        surface, color_track_filled, track_filled_rect, border_radius=track_radius
+    )
     pg.draw.circle(surface, color_handle, handle_center, handle_radius)
     if border_width > 0:
         pg.draw.circle(
@@ -521,6 +560,7 @@ def dropdown_header(
     color_arrow: RGBColor | None = None,
     hover_lighten: float | None = None,
     hovered: bool = False,
+    corner_radius: int | None = None,
 ) -> None:
     """Draw a single dropdown header onto the given surface.
 
@@ -664,6 +704,7 @@ def dropdown_header(
         color_border_inner_light,
         color_border_inner_dark,
         border_width_inner,
+        _corner_radius(corner_radius),
     )
 
     # Selected-option label, left-aligned with room reserved on the right for

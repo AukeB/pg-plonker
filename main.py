@@ -31,12 +31,12 @@ def main() -> None:
     screen = pg.display.set_mode(window_size)
     pg.display.set_caption("PyGame Plonker Testing")
 
-    set_style("terminal")
+    set_style("chalk")
 
     panel = GUIPanel(surface=screen)
 
     button = panel.add_button()
-    slider = panel.add_slider(start=0, stop=10, show_value=True)
+    slider = panel.add_slider(start=0, stop=1000, show_value=True)
     dropdown = panel.add_dropdown(options=[
         "Level 0",
         "Level 1",

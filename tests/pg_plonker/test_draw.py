@@ -3,6 +3,7 @@
 import pygame as pg
 
 from pg_plonker import draw
+from pg_plonker.styles import set_style
 
 # Testing the "button" function.
 
@@ -532,3 +533,76 @@ def test_dropdown_options_with_zero_border_width_draws_no_frame(
     frame_edge = screen.get_at((20, 100 + 30))
 
     assert tuple(frame_edge)[:3] == (8, 9, 10)
+
+
+def test_button_with_corner_radius_leaves_the_corner_unfilled(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
+    screen.fill((255, 255, 255))
+
+    draw.button(
+        surface=screen,
+        font=font,
+        x=20,
+        y=20,
+        color_background=(10, 20, 30),
+        color_border=(0, 0, 0),
+        border_width=0,
+        border_width_inner=0,
+        corner_radius=10,
+    )
+
+    assert tuple(screen.get_at((20, 20)))[:3] == (255, 255, 255)
+    assert tuple(screen.get_at((20 + 54, 20)))[:3] == (10, 20, 30)
+
+
+def test_button_rounds_its_corners_when_the_active_style_is_rounded(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
+    screen.fill((255, 255, 255))
+    set_style("chalk")
+    try:
+        draw.button(
+            surface=screen,
+            font=font,
+            x=20,
+            y=20,
+            color_background=(10, 20, 30),
+            border_width=0,
+            border_width_inner=0,
+        )
+        corner = screen.get_at((20, 20))
+    finally:
+        set_style("embossed")
+
+    assert tuple(corner)[:3] == (255, 255, 255)
+
+
+def test_slider_track_ends_are_rounded_when_corner_radius_is_given(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
+    screen.fill((255, 255, 255))
+
+    draw.slider(
+        surface=screen,
+        font=font,
+        width=300,
+        height=12,
+        handle_radius=10,
+        color_track=(200, 200, 200),
+        color_track_filled=(10, 20, 30),
+        color_box_background=(255, 255, 255),
+        box_border_width=0,
+        box_border_width_inner=0,
+        corner_radius=6,
+        x=20,
+        y=100,
+        start=0,
+        stop=10,
+        value=10,
+        precision=1,
+        text=None,
+    )
+
+    assert tuple(screen.get_at((20, 94)))[:3] == (255, 255, 255)
+    assert tuple(screen.get_at((20 + 20, 100)))[:3] == (10, 20, 30)

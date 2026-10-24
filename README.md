@@ -198,6 +198,7 @@ The look of every control comes from the active style. The default style is `emb
 
 Available styles:
 
+- `"chalk"`: dark slate panel with sand-coloured buttons, a gold on state with dark text, and rounded corners. Its values are defined in `src/pg_plonker/styles/chalk.py`.
 - `"embossed"` (default): raised 3D controls with light and dark bevels. Its values are defined in `src/pg_plonker/styles/embossed.py`.
 - `"flat"`: no borders or bevels, and no hover or press effects. Its values are defined in `src/pg_plonker/styles/flat.py`.
 - `"terminal"`: monospace text, green on black, with green borders. Its values are defined in `src/pg_plonker/styles/terminal.py`.

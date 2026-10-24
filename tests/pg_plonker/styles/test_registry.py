@@ -9,6 +9,7 @@ import pytest
 from pg_plonker.controls import Button
 from pg_plonker.errors import StyleNotFoundError
 from pg_plonker.styles.registry import _STYLES, get_style, set_style
+from pg_plonker.styles.chalk import CHALK
 from pg_plonker.styles.embossed import EMBOSSED
 from pg_plonker.styles.flat import FLAT
 from pg_plonker.styles.soft import SOFT
@@ -77,3 +78,9 @@ def test_set_style_can_select_terminal_and_soft() -> None:
 
     set_style("soft")
     assert get_style() is SOFT
+
+
+def test_set_style_can_select_chalk() -> None:
+    set_style("chalk")
+
+    assert get_style() is CHALK

@@ -69,7 +69,7 @@ See `docs/style_design.md` for the full design.
 - [x] Add `DEFAULT_STYLE` to `constants.py`.
 - [x] Implement `"embossed"` style (default) — raised 3D buttons with light/dark bevels.
 - [x] Implement `"flat"` style — no borders or bevels, hover off.
-- [ ] Implement `"chalk"` style — dark background, muted tones, rounded corners.
+- [x] Implement `"chalk"` style — dark background, muted tones, rounded corners.
 - [x] Implement `"terminal"` style — monospace font (`SysFont` with common monospace names), green on black.
 - [x] Implement `"soft"` style — light pastel colours, subtle shadows.
 - [x] Implement `set_style()` and the style registry. It sets the active global style, which applies to all controls and draw calls, including ones created before the call.

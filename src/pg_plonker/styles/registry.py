@@ -8,6 +8,7 @@ Functions:
 
 from pg_plonker.constants import DEFAULT_STYLE
 from pg_plonker.errors import StyleNotFoundError
+from pg_plonker.styles.chalk import CHALK
 from pg_plonker.styles.embossed import EMBOSSED
 from pg_plonker.styles.flat import FLAT
 from pg_plonker.styles.models import Style
@@ -15,6 +16,7 @@ from pg_plonker.styles.soft import SOFT
 from pg_plonker.styles.terminal import TERMINAL
 
 _STYLES: dict[str, Style] = {
+    "chalk": CHALK,
     "embossed": EMBOSSED,
     "flat": FLAT,
     "soft": SOFT,
