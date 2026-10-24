@@ -22,13 +22,12 @@ Planned work for pg-plonker, sorted by priority (highest first). See `README.md`
 
 ### Configuration
 
-- [x] `ButtonConfig` default config model.
-- [x] `GUIPanelConfig` default config model.
+- [x] `ButtonConfig` and `GUIPanelConfig` default config models (since replaced by the `Style` dataclass in section 3).
 - [x] Removed unused `PGPlonkerConfig` aggregate.
 
 ### Utilities
 
-- [x] Font caching (`get_font`) to avoid repeated `pg.font.SysFont` calls.
+- [x] Fonts are created per control and reused until the font name or size changes, so `pg.font.SysFont` is not called on every draw.
 - [x] `get_window_size_from_screen_resolution` utility for sizing the window relative to the desktop.
 - [x] `WINDOW_SIZE_SCREEN_FRACTION` project constant for that sizing ratio.
 
@@ -60,30 +59,41 @@ Planned work for pg-plonker, sorted by priority (highest first). See `README.md`
 
 ## 3. Style system (`set_style`)
 
-- [ ] Design a style/theme data structure mapping style name → config values per control.
-- [ ] Implement `"embossed"` style — raised 3D buttons with light/dark inner borders creating depth.
-- [ ] Implement `"flat"` style — clean, minimal, no borders or shadows.
-- [ ] Implement `"chalk"` style — dark background with soft, muted tones and a rounded feel.
-- [ ] Implement `"terminal"` style — monospace font, green on black, CLI-inspired.
-- [ ] Implement `"soft"` style — light pastel colors, subtle shadows, friendly and modern.
-- [ ] Implement `set_style()` to set the active global style before creating controls.
-- [ ] Support per-control overrides after `set_style` has been applied.
+See `docs/style_design.md` for the full design.
+
+- [x] Remove the current (Minecraft-based) look and its config values from the codebase, and `gui_config_models.py` with it.
+- [x] Define the style dataclasses in `styles/models.py`: `ButtonStyle`, `SliderStyle`, `DropdownStyle` and `PanelStyle`, grouped in `Style` with the behaviour switches (`hover`, `press_bevel`, `rounded`) and their tuning fields.
+- [x] Add `errors.py` with `StyleNotFoundError`.
+- [x] Add `DEFAULT_STYLE` to `constants.py`.
+- [x] Implement `"embossed"` style (default) — raised 3D buttons with light/dark bevels.
+- [ ] Implement `"flat"` style — no borders or bevels, hover off.
+- [ ] Implement `"chalk"` style — dark background, muted tones, rounded corners.
+- [ ] Implement `"terminal"` style — monospace font (`SysFont` with common monospace names), green on black.
+- [ ] Implement `"soft"` style — light pastel colours, subtle shadows.
+- [x] Implement `set_style()` and the style registry. It sets the active global style, which applies to all controls and draw calls, including ones created before the call.
+- [ ] Controls, draw functions and `GUIPanel` read the active style at draw and event time. Explicit arguments given at construction override it until the next `set_style()` call.
+  - Done: controls, draw functions and `GUIPanel` read the active style at draw time, so an existing control follows a later `set_style()` call.
+  - Not done: explicit overrides are not yet dropped when `set_style()` is called. Doing so needs a registry of live controls.
+- [ ] Tests: every style sets every field, and an unknown style name raises `StyleNotFoundError`. (The shape, `embossed` and the unknown-name error are tested. Per-style checks come with each new style.)
 
 ## 4. Layout mode system (`set_mode`)
 
-- [ ] Define a common `Mode` interface/protocol that layout containers implement.
+Today `GUIPanel` is the only way to arrange controls. A layout mode chooses where and how controls are placed, so `GUIPanel` becomes one mode among others (e.g. a top bar, a row, a grid or a floating window). The user selects a mode by name, for example `pgp.set_mode("panel", align="right")`, and then adds controls the same way regardless of the mode.
+
+- [ ] Define a common `Mode` interface/protocol that layout containers implement (adding a control, handling events, drawing).
 - [ ] Refactor `GUIPanel` to conform to the `Mode` interface.
-- [ ] Implement `set_mode()` to select and activate a mode.
-- [ ] Decouple adding controls from being hardcoded to `GUIPanel` specifically.
+- [ ] Implement `set_mode()` to select and activate a mode by name.
+- [ ] Decouple adding controls from being hardcoded to `GUIPanel` specifically, so `add_button` etc. work in any mode.
 - [ ] Design how mode-specific config (e.g. `GUIPanelConfig`) gets passed through `set_mode()`.
 - [ ] Support multiple simultaneously active modes/panels (e.g. a left and a right panel).
 
 ## 5. Top-level ergonomic API
 
 - [x] Decide the public API surface for `src/pg_plonker/__init__.py`.
-- [x] Export `Button`, `GUIPanel`, `draw`, and the config models from `__init__.py`.
+- [x] Export `Button`, `Dropdown`, `Slider`, `GUIPanel`, and `draw` from `__init__.py`.
 - [x] Document the `import pg_plonker as pgp` convention in `README.md`.
-- [ ] Export `set_style` / `set_mode` from `__init__.py` once implemented.
+- [x] Export `set_style` from `__init__.py`.
+- [ ] Export `set_mode` from `__init__.py` once implemented.
 - [x] Add an `__all__` list to `__init__.py` to make the public surface explicit.
 
 ## 6. PyPI publishing

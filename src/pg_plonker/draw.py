@@ -10,17 +10,9 @@ Functions:
 import pygame as pg
 from pygame import Surface
 
-from pg_plonker.gui_config_models import (
-    ButtonConfig,
-    DropdownConfig,
-    RGBColor,
-    SliderConfig,
-)
+from pg_plonker.styles import get_style
+from pg_plonker.styles.models import RGBColor
 from pg_plonker.utils import lighten_color
-
-_config_button = ButtonConfig()
-_config_slider = SliderConfig()
-_config_dropdown = DropdownConfig()
 
 
 def button(
@@ -30,7 +22,7 @@ def button(
     font: pg.font.Font,
     width: int | None = None,
     height: int | None = None,
-    text: str | None = None,
+    text: str = "Button",
     border_width: int | None = None,
     border_width_inner: int | None = None,
     text_shadow_offset: int | None = None,
@@ -46,10 +38,10 @@ def button(
 ) -> None:
     """Draw a single button onto the given surface.
 
-    All parameters except surface are optional and fall back to the values
-    defined in the module- level ButtonConfig when not provided. This allows
-    quick usage with minimal arguments while still permitting per-call overrides
-    of any visual property.
+    All parameters except surface are optional and fall back to the values taken
+    from the active style when not provided. This allows quick usage with
+    minimal arguments while still permitting per-call overrides of any visual
+    property.
 
     A pressed button swaps its inner bevel colors so it reads as sunken, without
     moving.
@@ -89,61 +81,60 @@ def button(
     """
 
     # Get all arguments, either from function input or config.
-    width = width if width is not None else _config_button.width
-    height = height if height is not None else _config_button.height
-    text = text if text is not None else _config_button.text
+    width = width if width is not None else get_style().button.width
+    height = height if height is not None else get_style().button.height
 
     border_width = (
-        border_width if border_width is not None else _config_button.border_width
+        border_width if border_width is not None else get_style().button.border_width
     )
 
     border_width_inner = (
         border_width_inner
         if border_width_inner is not None
-        else _config_button.border_width_inner
+        else get_style().button.border_width_inner
     )
 
     text_shadow_offset = (
         text_shadow_offset
         if text_shadow_offset is not None
-        else _config_button.text_shadow_offset
+        else get_style().button.text_shadow_offset
     )
 
     color_background = (
         color_background
         if color_background is not None
-        else _config_button.color_background_inactive
+        else get_style().button.color_background_inactive
     )
 
     hover_lighten = (
-        hover_lighten if hover_lighten is not None else _config_button.hover_lighten
+        hover_lighten if hover_lighten is not None else get_style().hover_lighten
     )
 
     if hovered:
         color_background = lighten_color(color_background, hover_lighten)
 
-    color_text = color_text if color_text is not None else _config_button.color_text
+    color_text = color_text if color_text is not None else get_style().button.color_text
 
     color_border = (
-        color_border if color_border is not None else _config_button.color_border
+        color_border if color_border is not None else get_style().button.color_border
     )
 
     color_border_inner_light = (
         color_border_inner_light
         if color_border_inner_light is not None
-        else _config_button.color_border_inner_light
+        else get_style().button.color_border_inner_light
     )
 
     color_border_inner_dark = (
         color_border_inner_dark
         if color_border_inner_dark is not None
-        else _config_button.color_border_inner_dark
+        else get_style().button.color_border_inner_dark
     )
 
     color_text_shadow = (
         color_text_shadow
         if color_text_shadow is not None
-        else _config_button.color_text_shadow
+        else get_style().button.color_text_shadow
     )
 
     # Definitions depending on function/config input.
@@ -234,9 +225,9 @@ def slider(
     """Draw a single horizontal slider onto the given surface.
 
     All parameters except surface, x, y, start, stop, value, and precision are
-    optional and fall back to the values defined in the module-level
-    SliderConfig when not provided. This allows quick usage with minimal
-    arguments while still permitting per-call overrides of any visual property.
+    optional and fall back to the active style when not provided. This allows
+    quick usage with minimal arguments while still permitting per-call overrides
+    of any visual property.
 
     Args:
         surface (Surface): The pygame surface to draw onto.
@@ -273,41 +264,43 @@ def slider(
     """
 
     # Get all arguments, either from function input or config.
-    width = width if width is not None else _config_slider.width
-    height = height if height is not None else _config_slider.height
+    width = width if width is not None else get_style().slider.width
+    height = height if height is not None else get_style().slider.height
 
     handle_radius = (
-        handle_radius if handle_radius is not None else _config_slider.handle_radius
+        handle_radius if handle_radius is not None else get_style().slider.handle_radius
     )
 
     border_width = (
-        border_width if border_width is not None else _config_slider.border_width
+        border_width if border_width is not None else get_style().slider.border_width
     )
 
-    color_track = color_track if color_track is not None else _config_slider.color_track
+    color_track = (
+        color_track if color_track is not None else get_style().slider.color_track
+    )
 
     color_track_filled = (
         color_track_filled
         if color_track_filled is not None
-        else _config_slider.color_track_filled
+        else get_style().slider.color_track_filled
     )
 
     color_handle = (
-        color_handle if color_handle is not None else _config_slider.color_handle
+        color_handle if color_handle is not None else get_style().slider.color_handle
     )
 
     hover_lighten = (
-        hover_lighten if hover_lighten is not None else _config_slider.hover_lighten
+        hover_lighten if hover_lighten is not None else get_style().hover_lighten
     )
 
     if hovered:
         color_handle = lighten_color(color_handle, hover_lighten)
 
     color_border = (
-        color_border if color_border is not None else _config_slider.color_border
+        color_border if color_border is not None else get_style().slider.color_border
     )
 
-    color_text = color_text if color_text is not None else _config_slider.color_text
+    color_text = color_text if color_text is not None else get_style().slider.color_text
 
     # Definitions depending on function/config input.
     fraction = (value - start) / (stop - start)
@@ -365,8 +358,7 @@ def dropdown_header(
     flipping between pointing down (closed) and up (open).
 
     All parameters except surface, x, y, text, and is_open are optional and fall
-    back to the values defined in the module-level DropdownConfig when not
-    provided.
+    back to the active style when not provided.
 
     Args:
         surface (Surface): The pygame surface to draw onto.
@@ -412,74 +404,78 @@ def dropdown_header(
     """
 
     # Get all arguments, either from function input or config.
-    width = width if width is not None else _config_dropdown.width
-    height = height if height is not None else _config_dropdown.height
+    width = width if width is not None else get_style().dropdown.width
+    height = height if height is not None else get_style().dropdown.height
 
     border_width = (
-        border_width if border_width is not None else _config_dropdown.border_width
+        border_width if border_width is not None else get_style().dropdown.border_width
     )
 
     border_width_inner = (
         border_width_inner
         if border_width_inner is not None
-        else _config_dropdown.border_width_inner
+        else get_style().dropdown.border_width_inner
     )
 
     text_shadow_offset = (
         text_shadow_offset
         if text_shadow_offset is not None
-        else _config_dropdown.text_shadow_offset
+        else get_style().dropdown.text_shadow_offset
     )
 
-    arrow_size = arrow_size if arrow_size is not None else _config_dropdown.arrow_size
+    arrow_size = (
+        arrow_size if arrow_size is not None else get_style().dropdown.arrow_size
+    )
 
     text_padding = (
-        text_padding if text_padding is not None else _config_dropdown.text_padding
+        text_padding if text_padding is not None else get_style().dropdown.text_padding
     )
 
     color_background = (
         color_background
         if color_background is not None
         else (
-            _config_dropdown.color_background_active
+            get_style().dropdown.color_background_active
             if is_open
-            else _config_dropdown.color_background_inactive
+            else get_style().dropdown.color_background_inactive
         )
     )
 
     hover_lighten = (
-        hover_lighten if hover_lighten is not None else _config_dropdown.hover_lighten
+        hover_lighten if hover_lighten is not None else get_style().hover_lighten
     )
 
     if hovered and not is_open:
         color_background = lighten_color(color_background, hover_lighten)
 
-    color_text = color_text if color_text is not None else _config_dropdown.color_text
+    color_text = (
+        color_text if color_text is not None else get_style().dropdown.color_text
+    )
 
     color_border = (
-        color_border if color_border is not None else _config_dropdown.color_border
+        color_border if color_border is not None else get_style().dropdown.color_border
     )
 
     color_border_inner_light = (
         color_border_inner_light
         if color_border_inner_light is not None
-        else _config_dropdown.color_border_inner_light
+        else get_style().dropdown.color_border_inner_light
     )
 
     color_border_inner_dark = (
         color_border_inner_dark
         if color_border_inner_dark is not None
-        else _config_dropdown.color_border_inner_dark
+        else get_style().dropdown.color_border_inner_dark
     )
 
     color_text_shadow = (
         color_text_shadow
         if color_text_shadow is not None
-        else _config_dropdown.color_text_shadow
+        else get_style().dropdown.color_text_shadow
     )
 
     color_arrow = (
-        color_arrow if color_arrow is not None else _config_dropdown.color_arrow
+        color_arrow if color_arrow is not None else get_style().dropdown.color_arrow
     )
 
     # Definitions depending on function/config input.
@@ -582,8 +578,7 @@ def dropdown_options(
     controls so the list overlays anything beneath it.
 
     All parameters except surface, x, y, options, and hovered_index are optional
-    and fall back to the values defined in the module-level DropdownConfig when
-    not provided.
+    and fall back to the active style when not provided.
 
     Args:
         surface (Surface): The pygame surface to draw onto.
@@ -613,36 +608,40 @@ def dropdown_options(
     """
 
     # Get all arguments, either from function input or config.
-    width = width if width is not None else _config_dropdown.width
+    width = width if width is not None else get_style().dropdown.width
 
     option_height = (
-        option_height if option_height is not None else _config_dropdown.option_height
+        option_height
+        if option_height is not None
+        else get_style().dropdown.option_height
     )
 
     border_width = (
-        border_width if border_width is not None else _config_dropdown.border_width
+        border_width if border_width is not None else get_style().dropdown.border_width
     )
 
     text_padding = (
-        text_padding if text_padding is not None else _config_dropdown.text_padding
+        text_padding if text_padding is not None else get_style().dropdown.text_padding
     )
 
     color_background_option = (
         color_background_option
         if color_background_option is not None
-        else _config_dropdown.color_background_option
+        else get_style().dropdown.color_background_option
     )
 
     color_background_option_hover = (
         color_background_option_hover
         if color_background_option_hover is not None
-        else _config_dropdown.color_background_option_hover
+        else get_style().dropdown.color_background_option_hover
     )
 
-    color_text = color_text if color_text is not None else _config_dropdown.color_text
+    color_text = (
+        color_text if color_text is not None else get_style().dropdown.color_text
+    )
 
     color_border = (
-        color_border if color_border is not None else _config_dropdown.color_border
+        color_border if color_border is not None else get_style().dropdown.color_border
     )
 
     # Drawing operations.

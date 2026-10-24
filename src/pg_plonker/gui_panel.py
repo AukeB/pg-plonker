@@ -7,9 +7,9 @@ import pygame as pg
 from pygame import Rect, Surface
 
 from pg_plonker.controls import Button, Dropdown, Slider
-from pg_plonker.gui_config_models import GUIPanelConfig, RGBColor
-
-_config_gui_panel = GUIPanelConfig()
+from pg_plonker.styles import get_style
+from pg_plonker.styles.models import RGBColor
+from pg_plonker.utils import resolve_override
 
 
 class GUIPanel:
@@ -39,11 +39,11 @@ class GUIPanel:
     def __init__(
         self,
         surface: Surface,
-        width: int | None = None,
+        width: int = 620,
         border_width: int | None = None,
-        margin_gui_panel: int | None = None,
-        margin_button: int | None = None,
-        align_right: bool | None = None,
+        margin_gui_panel: int = 40,
+        margin_button: int = 24,
+        align_right: bool = True,
         color_background: RGBColor | None = None,
         color_border: RGBColor | None = None,
     ) -> None:
@@ -59,55 +59,30 @@ class GUIPanel:
         alignment settings. The panel creates a subsurface to provide a local
         drawing coordinate space for contained controls.
 
-        All configuration parameters are optional and fall back to values
-        defined in `GUIPanelConfig` when not provided.
+        The layout arguments (width, margins, alignment) are plain values for
+        this panel. The visual arguments (border width and colours) are
+        overrides; any argument left as None follows the active style.
 
         Args:
             surface (Surface): The main pygame surface the panel is attached to.
-            width (int | None): Width of the panel in pixels.
-            border_width (int | None): Thickness of the divider line in pixels.
-            margin_gui_panel (int | None): Top padding inside the panel.
-            margin_button (int | None): Vertical spacing between controls.
-            align_right (bool | None): If True, panel is anchored to the right
-                side.
-            color_background (RGBColor | None): Background fill color of the
-                panel.
-            color_border (RGBColor | None): Color of the divider line.
+            width (int): Width of the panel in pixels.
+            border_width (int | None): Divider line thickness override in
+                pixels.
+            margin_gui_panel (int): Top padding inside the panel.
+            margin_button (int): Vertical spacing between controls.
+            align_right (bool): If True, panel is anchored to the right side.
+            color_background (RGBColor | None): Background color override.
+            color_border (RGBColor | None): Divider color override.
         """
 
-        # Get all arguments, either from function input or config.
         self.surface = surface
-        self.width = width if width is not None else _config_gui_panel.width
-
-        self.border_width = (
-            border_width if border_width is not None else _config_gui_panel.border_width
-        )
-
-        self.margin_gui_panel = (
-            margin_gui_panel
-            if margin_gui_panel is not None
-            else _config_gui_panel.margin_gui_panel
-        )
-
-        self.margin_button = (
-            margin_button
-            if margin_button is not None
-            else _config_gui_panel.margin_button
-        )
-
-        self.align_right = (
-            align_right if align_right is not None else _config_gui_panel.align_right
-        )
-
-        self.color_background = (
-            color_background
-            if color_background is not None
-            else _config_gui_panel.color_background
-        )
-
-        self.color_border = (
-            color_border if color_border is not None else _config_gui_panel.color_border
-        )
+        self.width = width
+        self._border_width = border_width
+        self.margin_gui_panel = margin_gui_panel
+        self.margin_button = margin_button
+        self.align_right = align_right
+        self._color_background = color_background
+        self._color_border = color_border
 
         # Layout of the GUI Panel.
         screen_width, screen_height = surface.get_size()
@@ -119,6 +94,39 @@ class GUIPanel:
         # Controls.
         self._controls: list[Button | Slider | Dropdown] = []
         self._next_control_y = self.margin_gui_panel
+
+    @property
+    def border_width(self) -> int:
+        """Divider thickness in pixels: the override if given, otherwise the
+        style value.
+        """
+
+        style = get_style()
+        border_width = resolve_override(self._border_width, style.panel.border_width)
+
+        return border_width
+
+    @property
+    def color_background(self) -> RGBColor:
+        """Panel background color: the override if given, otherwise the style
+        value.
+        """
+
+        style = get_style()
+        color_background = resolve_override(
+            self._color_background, style.panel.color_background
+        )
+
+        return color_background
+
+    @property
+    def color_border(self) -> RGBColor:
+        """Divider color: the override if given, otherwise the style value."""
+
+        style = get_style()
+        color_border = resolve_override(self._color_border, style.panel.color_border)
+
+        return color_border
 
     def _translate_event_to_local(self, event: pg.event.Event) -> pg.event.Event:
         """Translate a screen-space pygame event into panel-local coordinates.
@@ -158,7 +166,7 @@ class GUIPanel:
         *,
         width: int | None = None,
         height: int | None = None,
-        text: str | None = None,
+        text: str = "Button",
         font_name: str | None = None,
         font_size: int | None = None,
         border_width: int | None = None,
@@ -189,7 +197,7 @@ class GUIPanel:
         Args:
             width (int | None): Button width in pixels.
             height (int | None): Button height in pixels.
-            text (str | None): Label displayed inside the button.
+            text (str): Label displayed inside the button.
             font_name (str | None): Font family used for rendering text.
             font_size (int | None): Font size in points.
             border_width (int | None): Outer border thickness.
@@ -239,14 +247,6 @@ class GUIPanel:
         button_y = self._next_control_y
         button.x = button_x
         button.y = button_y
-
-        # Assign final position (panel-local coords)
-        button.rect = pg.Rect(
-            button_x,
-            button_y,
-            button.rect.width,
-            button.rect.height,
-        )
 
         # Advance layout cursor for next GUI element that will be placed.
         self._next_control_y += button.rect.height + self.margin_button
@@ -355,14 +355,6 @@ class GUIPanel:
 
         slider.x = slider_x
         slider.y = slider_y
-
-        # Assign final position (panel-local coords)
-        slider.rect = pg.Rect(
-            slider_x,
-            slider_y - slider.rect.height // 2,
-            slider.rect.width,
-            slider.rect.height,
-        )
 
         # Advance layout cursor for next GUI element that will be placed. The
         # slider reserves margin_vertical spacing both above and below its
@@ -484,14 +476,6 @@ class GUIPanel:
         dropdown_y = self._next_control_y
         dropdown.x = dropdown_x
         dropdown.y = dropdown_y
-
-        # Assign final position (panel-local coords)
-        dropdown.rect = pg.Rect(
-            dropdown_x,
-            dropdown_y,
-            dropdown.rect.width,
-            dropdown.rect.height,
-        )
 
         # Advance layout cursor for next GUI element that will be placed. Only
         # the closed header's height is reserved: the open option list

@@ -1,56 +1,40 @@
 """Module for the stateful controls.
 
+Functions: - _create_font: Create a system font for a control.
+
 Classes:
 - Button: A stateful toggle button that delegates rendering to draw.button.
 - Slider: A stateful horizontal slider that delegates rendering to draw.slider.
 - Dropdown: A stateful dropdown that delegates rendering to the draw.dropdown
   functions.
+
+Controls read the active style every time they are used, so a later set_style()
+call changes existing controls too. Arguments given to a constructor are kept as
+overrides until the next set_style() call.
 """
 
 import pygame as pg
 from pygame import Surface
 
 from pg_plonker import draw
-from pg_plonker.gui_config_models import (
-    ButtonConfig,
-    DropdownConfig,
-    RGBColor,
-    SliderConfig,
-)
-from pg_plonker.utils import count_decimal_places
-
-_config_button = ButtonConfig()
-_config_slider = SliderConfig()
-_config_dropdown = DropdownConfig()
+from pg_plonker.styles import get_style
+from pg_plonker.styles.models import RGBColor
+from pg_plonker.utils import count_decimal_places, resolve_override
 
 
-def _create_font(
-    font_name: str | None,
-    font_size: int | None,
-    default_font_name: str,
-    default_font_size: int,
-) -> pg.font.Font:
-    """Create the font a control renders its text with.
-
-    Called once per control, in its constructor, so the font is never created
-    while drawing. The font belongs to the control, not to a shared cache, so it
-    stays valid for as long as the control does.
+def _create_font(font_name: str, font_size: int) -> pg.font.Font:
+    """Create a system font for a control.
 
     Args:
-        font_name (str | None): Requested system font name, or None for the
-            control's default.
-        font_size (int | None): Requested font size in points, or None for the
-            control's default.
-        default_font_name (str): Font name used when font_name is None.
-        default_font_size (int): Font size used when font_size is None.
+        font_name (str): System font name, or a list of names separated by
+            commas.
+        font_size (int): Font size in points.
 
     Returns:
-        font (pg.font.Font): The font object for the control.
+        font (pg.font.Font): The font object.
     """
 
-    resolved_font_name = font_name if font_name is not None else default_font_name
-    resolved_font_size = font_size if font_size is not None else default_font_size
-    font = pg.font.SysFont(name=resolved_font_name, size=resolved_font_size)
+    font = pg.font.SysFont(name=font_name, size=font_size)
 
     return font
 
@@ -62,21 +46,15 @@ class Button:
         surface (Surface): The pygame surface the button is drawn onto.
         x (int): X-position of the button in pixels.
         y (int): Y-position of the button in pixels.
-        width (int): Button width in pixels.
-        height (int): Button height in pixels.
-        text (str | None): Label rendered inside the button.
-        font (pg.font.Font): Font used to render the text.
+        text (str): Label rendered inside the button.
         border_width (int | None): Outer border thickness in pixels.
         border_width_inner (int | None): Inner border thickness in pixels.
         text_shadow_offset (int | None): Pixel offset of the text shadow.
-        color_background_active (RGBColor): Background color when active.
-        color_background_inactive (RGBColor): Background color when inactive.
         color_text (RGBColor | None): Color of the button text.
         color_border (RGBColor | None): Outer border color.
         color_border_inner_light (RGBColor | None): Light inner border color.
         color_border_inner_dark (RGBColor | None): Dark inner border color.
         color_text_shadow (RGBColor | None): Color of the text shadow.
-        rect (pg.Rect): The button's bounding rectangle.
         value (bool): Toggle state, True when active.
 
     Example:
@@ -94,7 +72,7 @@ class Button:
         y: int,
         width: int | None = None,
         height: int | None = None,
-        text: str | None = None,
+        text: str = "Button",
         font_name: str | None = None,
         font_size: int | None = None,
         border_width: int | None = None,
@@ -110,14 +88,11 @@ class Button:
         value: bool = False,
     ) -> None:
         """Initialize a Button instance with rendering surface, position, and
-        visual configuration.
+        visual overrides.
 
         The Button is a stateful UI element that can toggle between active and
-        inactive states. It stores its geometry and visual configuration and
-        delegates rendering to the stateless `draw.button` function each frame.
-
-        All visual parameters are optional and fall back to defaults defined in
-        `ButtonConfig` when not provided.
+        inactive states. Any argument left as None follows the active style, and
+        is read again each time the button is drawn.
 
         Args:
             surface (Surface): The pygame surface the button will be drawn onto.
@@ -125,28 +100,27 @@ class Button:
                 space).
             y (int): Y-position of the button in pixels (screen or panel-local
                 space).
-            width (int | None): Button width in pixels, defaults to config value
-                if None.
-            height (int | None): Button height in pixels, defaults to config
-                value if None.
-            text (str | None): Label rendered inside the button.
-            font_name (str | None): System font name used for rendering text.
-            font_size (int | None): Font size in points for button text.
-            border_width (int | None): Outer border thickness in pixels.
-            border_width_inner (int | None): Inner border thickness in pixels.
-            text_shadow_offset (int | None): Pixel offset used for text shadow
-                rendering.
-            color_background_active (RGBColor | None): Background color when
+            width (int | None): Button width override in pixels.
+            height (int | None): Button height override in pixels.
+            text (str): Label rendered inside the button.
+            font_name (str | None): System font name override.
+            font_size (int | None): Font size override in points.
+            border_width (int | None): Outer border thickness override in
+                pixels.
+            border_width_inner (int | None): Inner border thickness override.
+            text_shadow_offset (int | None): Text shadow offset override in
+                pixels.
+            color_background_active (RGBColor | None): Background override when
                 active.
-            color_background_inactive (RGBColor | None): Background color when
-                inactive.
-            color_text (RGBColor | None): Color of the button text.
-            color_border (RGBColor | None): Outer border color.
-            color_border_inner_light (RGBColor | None): Light inner border
-                highlight color.
-            color_border_inner_dark (RGBColor | None): Dark inner border shadow
-                color.
-            color_text_shadow (RGBColor | None): Color of the text shadow.
+            color_background_inactive (RGBColor | None): Background override
+                when inactive.
+            color_text (RGBColor | None): Color override of the button text.
+            color_border (RGBColor | None): Outer border color override.
+            color_border_inner_light (RGBColor | None): Light inner border color
+                override.
+            color_border_inner_dark (RGBColor | None): Dark inner border color
+                override.
+            color_text_shadow (RGBColor | None): Text shadow color override.
             value (bool): Initial toggle value of the button (False = inactive,
                 True = active).
         """
@@ -155,41 +129,23 @@ class Button:
         self.surface = surface
         self.x = x
         self.y = y
-        self.width = width if width is not None else _config_button.width
-        self.height = height if height is not None else _config_button.height
         self.text = text
-
-        self.font = _create_font(
-            font_name=font_name,
-            font_size=font_size,
-            default_font_name=_config_button.font_name,
-            default_font_size=_config_button.font_size,
-        )
-
+        self._width = width
+        self._height = height
+        self._font_name = font_name
+        self._font_size = font_size
+        self._font: pg.font.Font | None = None
+        self._font_key: tuple[str, int] | None = None
         self.border_width = border_width
         self.border_width_inner = border_width_inner
         self.text_shadow_offset = text_shadow_offset
-
-        self.color_background_active = (
-            color_background_active
-            if color_background_active is not None
-            else _config_button.color_background_active
-        )
-
-        self.color_background_inactive = (
-            color_background_inactive
-            if color_background_inactive is not None
-            else _config_button.color_background_inactive
-        )
-
+        self._color_background_active = color_background_active
+        self._color_background_inactive = color_background_inactive
         self.color_text = color_text
         self.color_border = color_border
         self.color_border_inner_light = color_border_inner_light
         self.color_border_inner_dark = color_border_inner_dark
         self.color_text_shadow = color_text_shadow
-
-        # Definitions depending on function/config input.
-        self.rect = pg.Rect(self.x, self.y, self.width, self.height)
 
         # State.
         self.value = value
@@ -197,19 +153,83 @@ class Button:
         self._pointer_inside = False
         self._hovered = False
 
+    @property
+    def width(self) -> int:
+        """Button width in pixels: the override if given, otherwise the style
+        value.
+        """
+
+        style = get_style()
+        width = resolve_override(self._width, style.button.width)
+
+        return width
+
+    @property
+    def height(self) -> int:
+        """Button height in pixels: the override if given, otherwise the style
+        value.
+        """
+
+        style = get_style()
+        height = resolve_override(self._height, style.button.height)
+
+        return height
+
+    @property
+    def rect(self) -> pg.Rect:
+        """The button's bounding rectangle, from its current size and position."""
+
+        rect = pg.Rect(self.x, self.y, self.width, self.height)
+
+        return rect
+
+    @property
+    def font(self) -> pg.font.Font:
+        """The font for the label, recreated only when the font name or size
+        changes.
+        """
+
+        style = get_style()
+        font_name = resolve_override(self._font_name, style.button.font_name)
+        font_size = resolve_override(self._font_size, style.button.font_size)
+        font_key = (font_name, font_size)
+
+        if self._font is None or self._font_key != font_key:
+            self._font = _create_font(font_name=font_name, font_size=font_size)
+            self._font_key = font_key
+
+        return self._font
+
+    def _background_color(self) -> RGBColor:
+        """Return the background color for the current toggle state.
+
+        Returns:
+            color (RGBColor): The active or inactive background color.
+        """
+
+        style = get_style()
+
+        if self.value:
+            color = resolve_override(
+                self._color_background_active, style.button.color_background_active
+            )
+        else:
+            color = resolve_override(
+                self._color_background_inactive, style.button.color_background_inactive
+            )
+
+        return color
+
     def draw(self) -> None:
-        """Draw the button reflecting the current toggle state and press state."""
+        """Draw the button reflecting the toggle state, press state and hover."""
 
-        color_background = (
-            self.color_background_active
-            if self.value
-            else self.color_background_inactive
-        )
-
-        pressed = self._pressed and self._pointer_inside
+        style = get_style()
+        hovered = self._hovered and style.hover
+        pressed = self._pressed and self._pointer_inside and style.press_bevel
+        color_background = self._background_color()
 
         draw.button(
-            hovered=self._hovered,
+            hovered=hovered,
             surface=self.surface,
             x=self.x,
             y=self.y,
@@ -270,23 +290,8 @@ class Slider:
         start (int | float): The minimum value of the range.
         stop (int | float): The maximum value of the range.
         step (int | float | None): Increment the value snaps to when dragging.
-        width (int): Track width in pixels.
-        height (int): Track height in pixels.
-        handle_radius (int | None): Handle circle radius in pixels.
         border_width (int | None): Handle border thickness in pixels.
-        margin_vertical (int): Vertical spacing reserved around the track in a
-            panel.
-        font (pg.font.Font): Font used to render the text.
-        extra_decimal_places (int): Decimal places added on top of the implied
-            precision.
         show_value (bool): Whether the current value is drawn above the handle.
-        color_track (RGBColor | None): Track fill color.
-        color_track_filled (RGBColor | None): Color of the filled part of the
-            track.
-        color_handle (RGBColor | None): Handle fill color.
-        color_border (RGBColor | None): Handle border color.
-        color_text (RGBColor | None): Value readout text color.
-        rect (pg.Rect): The track's bounding rectangle.
         value (int | float): The current value, within [start, stop].
 
     Example:
@@ -322,15 +327,10 @@ class Slider:
         color_text: RGBColor | None = None,
     ) -> None:
         """Initialize a Slider instance with rendering surface, position, range,
-        and visual configuration.
+        and visual overrides.
 
-        The Slider is a stateful UI element that holds a numeric value within a
-        fixed [start, stop] range. It stores its geometry, range, and visual
-        configuration and delegates rendering to the stateless `draw.slider`
-        function each frame.
-
-        All visual parameters are optional and fall back to defaults defined in
-        `SliderConfig` when not provided.
+        Any argument left as None follows the active style, and is read again
+        each time the slider is used.
 
         Args:
             surface (Surface): The pygame surface the slider will be drawn onto.
@@ -344,28 +344,26 @@ class Slider:
                 None.
             step (int | float | None): Increment the value snaps to when
                 dragging. If None, the value is continuous, limited only by the
-                configured decimal precision.
-            width (int | None): Track width in pixels, defaults to config value
-                if None.
-            height (int | None): Track height in pixels, defaults to config
-                value if None.
-            handle_radius (int | None): Handle circle radius in pixels.
-            border_width (int | None): Handle border thickness in pixels.
-            margin_vertical (int | None): Vertical spacing reserved above and
-                below the slider track when laid out in a GUIPanel, defaults to
-                config value if None.
-            font_name (str | None): System font name used for the value readout.
-            font_size (int | None): Font size in points for the value readout.
-            extra_decimal_places (int | None): Number of decimal places added on
-                top of the precision already implied by start/stop.
+                precision.
+            width (int | None): Track width override in pixels.
+            height (int | None): Track height override in pixels.
+            handle_radius (int | None): Handle radius override in pixels.
+            border_width (int | None): Handle border thickness override in
+                pixels.
+            margin_vertical (int | None): Vertical spacing override reserved
+                above and below the track when laid out in a GUIPanel.
+            font_name (str | None): System font name override.
+            font_size (int | None): Font size override in points.
+            extra_decimal_places (int | None): Decimal places override added on
+                top of the precision implied by start/stop/step.
             show_value (bool): Whether to render the current value above the
                 handle.
-            color_track (RGBColor | None): Track fill color.
-            color_track_filled (RGBColor | None): Color of the filled portion of
-                the track to the left of the handle.
-            color_handle (RGBColor | None): Handle fill color.
-            color_border (RGBColor | None): Handle border color.
-            color_text (RGBColor | None): Value readout text color.
+            color_track (RGBColor | None): Track fill color override.
+            color_track_filled (RGBColor | None): Color override of the filled
+                portion of the track.
+            color_handle (RGBColor | None): Handle fill color override.
+            color_border (RGBColor | None): Handle border color override.
+            color_text (RGBColor | None): Value readout color override.
 
         Raises:
             ValueError: If start is not strictly less than stop, or if value
@@ -385,36 +383,16 @@ class Slider:
         self.start = start
         self.stop = stop
         self.step = step
-        self.width = width if width is not None else _config_slider.width
-        self.height = height if height is not None else _config_slider.height
-
-        self.handle_radius = (
-            handle_radius if handle_radius is not None else _config_slider.handle_radius
-        )
-
-        self.border_width = (
-            border_width if border_width is not None else _config_slider.border_width
-        )
-
-        self.margin_vertical = (
-            margin_vertical
-            if margin_vertical is not None
-            else _config_slider.margin_vertical
-        )
-
-        self.font = _create_font(
-            font_name=font_name,
-            font_size=font_size,
-            default_font_name=_config_slider.font_name,
-            default_font_size=_config_slider.font_size,
-        )
-
-        self.extra_decimal_places = (
-            extra_decimal_places
-            if extra_decimal_places is not None
-            else _config_slider.extra_decimal_places
-        )
-
+        self._width = width
+        self._height = height
+        self._handle_radius = handle_radius
+        self.border_width = border_width
+        self._margin_vertical = margin_vertical
+        self._font_name = font_name
+        self._font_size = font_size
+        self._font: pg.font.Font | None = None
+        self._font_key: tuple[str, int] | None = None
+        self._extra_decimal_places = extra_decimal_places
         self.show_value = show_value
         self.color_track = color_track
         self.color_track_filled = color_track_filled
@@ -422,22 +400,104 @@ class Slider:
         self.color_border = color_border
         self.color_text = color_text
 
-        # Definitions depending on function/config input.
-        self.rect = pg.Rect(self.x, self.y - self.height // 2, self.width, self.height)
-
-        # The decimal count implied by start/stop/step, plus a buffer, so
-        # dragged values stay free of floating-point noise while remaining
-        # readable.
-        start_decimals = count_decimal_places(self.start)
-        stop_decimals = count_decimal_places(self.stop)
-        step_decimals = count_decimal_places(self.step) if self.step is not None else 0
-        largest_decimals = max(start_decimals, stop_decimals, step_decimals)
-        self._precision = largest_decimals + self.extra_decimal_places
-
         # State.
         self.value = round(value if value is not None else self.start, self._precision)
         self._dragging = False
         self._hovered = False
+
+    @property
+    def width(self) -> int:
+        """Track width in pixels: the override if given, otherwise the style
+        value.
+        """
+
+        style = get_style()
+        width = resolve_override(self._width, style.slider.width)
+
+        return width
+
+    @property
+    def height(self) -> int:
+        """Track height in pixels: the override if given, otherwise the style
+        value.
+        """
+
+        style = get_style()
+        height = resolve_override(self._height, style.slider.height)
+
+        return height
+
+    @property
+    def handle_radius(self) -> int:
+        """Handle radius in pixels: the override if given, otherwise the style
+        value.
+        """
+
+        style = get_style()
+        handle_radius = resolve_override(
+            self._handle_radius, style.slider.handle_radius
+        )
+
+        return handle_radius
+
+    @property
+    def margin_vertical(self) -> int:
+        """Vertical spacing around the track: the override if given, otherwise
+        the style value.
+        """
+
+        style = get_style()
+        margin_vertical = resolve_override(
+            self._margin_vertical, style.slider.margin_vertical
+        )
+
+        return margin_vertical
+
+    @property
+    def rect(self) -> pg.Rect:
+        """The track's bounding rectangle, centred vertically on y."""
+
+        rect = pg.Rect(self.x, self.y - self.height // 2, self.width, self.height)
+
+        return rect
+
+    @property
+    def font(self) -> pg.font.Font:
+        """The font for the value readout, recreated only when the name or size
+        changes.
+        """
+
+        style = get_style()
+        font_name = resolve_override(self._font_name, style.slider.font_name)
+        font_size = resolve_override(self._font_size, style.slider.font_size)
+        font_key = (font_name, font_size)
+
+        if self._font is None or self._font_key != font_key:
+            self._font = _create_font(font_name=font_name, font_size=font_size)
+            self._font_key = font_key
+
+        return self._font
+
+    @property
+    def _precision(self) -> int:
+        """Decimal places used to round values.
+
+        The count comes from start, stop and step, plus a buffer, so dragged
+        values stay free of floating-point noise while remaining readable.
+        """
+
+        style = get_style()
+        extra_decimal_places = resolve_override(
+            self._extra_decimal_places, style.slider.extra_decimal_places
+        )
+
+        start_decimals = count_decimal_places(self.start)
+        stop_decimals = count_decimal_places(self.stop)
+        step_decimals = count_decimal_places(self.step) if self.step is not None else 0
+        largest_decimals = max(start_decimals, stop_decimals, step_decimals)
+        precision = largest_decimals + extra_decimal_places
+
+        return precision
 
     def _get_handle_center(self) -> tuple[int, int]:
         """Compute the current pixel center of the handle from self.value.
@@ -487,7 +547,10 @@ class Slider:
         return value
 
     def draw(self) -> None:
-        """Draw the slider reflecting the current value."""
+        """Draw the slider reflecting the current value and hover state."""
+
+        style = get_style()
+        hovered = self._hovered and style.hover
 
         draw.slider(
             surface=self.surface,
@@ -506,7 +569,7 @@ class Slider:
             color_track=self.color_track,
             color_track_filled=self.color_track_filled,
             color_handle=self.color_handle,
-            hovered=self._hovered,
+            hovered=hovered,
             color_border=self.color_border,
             color_text=self.color_text,
         )
@@ -560,29 +623,17 @@ class Dropdown:
         x (int): X-position of the header in pixels.
         y (int): Y-position of the header in pixels.
         options (list[str]): The selectable option labels, in display order.
-        width (int): Header and option width in pixels.
-        height (int): Header height in pixels.
-        option_height (int): Height of each option row in pixels.
-        font (pg.font.Font): Font used to render the text.
         border_width (int | None): Outer border thickness in pixels.
         border_width_inner (int | None): Inner border thickness in pixels.
         text_shadow_offset (int | None): Pixel offset of the header's text
             shadow.
         arrow_size (int | None): Half-width and height of the arrow in pixels.
-        color_background_active (RGBColor): Header background color while open.
-        color_background_inactive (RGBColor): Header background color while
-            closed.
-        color_background_option (RGBColor | None): Default option row
-            background.
-        color_background_option_hover (RGBColor | None): Hovered option row
-            background.
         color_text (RGBColor | None): Header and option text color.
         color_border (RGBColor | None): Outer and option border color.
         color_border_inner_light (RGBColor | None): Light inner border color.
         color_border_inner_dark (RGBColor | None): Dark inner border color.
         color_text_shadow (RGBColor | None): Color of the header's text shadow.
         color_arrow (RGBColor | None): Arrow indicator color.
-        rect (pg.Rect): The header's bounding rectangle.
         value (str): The selected option.
         is_open (bool): Whether the option list is open.
 
@@ -622,7 +673,7 @@ class Dropdown:
         color_arrow: RGBColor | None = None,
     ) -> None:
         """Initialize a Dropdown instance with rendering surface, position,
-        options, and visual configuration.
+        options, and visual overrides.
 
         The Dropdown is a stateful UI element that holds a selected value from a
         fixed list of options. While closed, only the header is drawn and
@@ -630,8 +681,8 @@ class Dropdown:
         `draw_options`) so it overlays other controls rather than pushing them
         down, and it captures clicks exclusively until it closes again.
 
-        All visual parameters are optional and fall back to defaults defined in
-        `DropdownConfig` when not provided.
+        Any argument left as None follows the active style, and is read again
+        each time the dropdown is used.
 
         Args:
             surface (Surface): The pygame surface the dropdown will be drawn
@@ -643,37 +694,34 @@ class Dropdown:
             options (list[str]): The selectable option labels, in display order.
             value (str | None): Initial selected value, defaults to the first
                 option if None.
-            width (int | None): Header/option width in pixels, defaults to
-                config value if None.
-            height (int | None): Header height in pixels, defaults to config
-                value if None.
-            option_height (int | None): Height of each option row in pixels,
-                defaults to config value if None.
-            font_name (str | None): System font name used for rendering text.
-            font_size (int | None): Font size in points for header/option text.
-            border_width (int | None): Outer border thickness in pixels.
-            border_width_inner (int | None): Inner border thickness in pixels.
-            text_shadow_offset (int | None): Pixel offset used for the header's
-                text shadow rendering.
-            arrow_size (int | None): Half-width/height of the arrow indicator in
+            width (int | None): Header/option width override in pixels.
+            height (int | None): Header height override in pixels.
+            option_height (int | None): Option row height override in pixels.
+            font_name (str | None): System font name override.
+            font_size (int | None): Font size override in points.
+            border_width (int | None): Outer border thickness override in
                 pixels.
-            color_background_active (RGBColor | None): Header background color
-                while open.
-            color_background_inactive (RGBColor | None): Header background color
-                while closed.
-            color_background_option (RGBColor | None): Default option row
-                background color.
+            border_width_inner (int | None): Inner border thickness override.
+            text_shadow_offset (int | None): Text shadow offset override in
+                pixels.
+            arrow_size (int | None): Arrow size override in pixels.
+            color_background_active (RGBColor | None): Header background
+                override while open.
+            color_background_inactive (RGBColor | None): Header background
+                override while closed.
+            color_background_option (RGBColor | None): Option row background
+                override.
             color_background_option_hover (RGBColor | None): Hovered option row
-                background color.
-            color_text (RGBColor | None): Color of the header and option text.
-            color_border (RGBColor | None): Outer/option border color.
-            color_border_inner_light (RGBColor | None): Light inner border
-                highlight color.
-            color_border_inner_dark (RGBColor | None): Dark inner border shadow
-                color.
-            color_text_shadow (RGBColor | None): Color of the header's text
-                shadow.
-            color_arrow (RGBColor | None): Arrow indicator color.
+                background override.
+            color_text (RGBColor | None): Header and option text color override.
+            color_border (RGBColor | None): Outer/option border color override.
+            color_border_inner_light (RGBColor | None): Light inner border color
+                override.
+            color_border_inner_dark (RGBColor | None): Dark inner border color
+                override.
+            color_text_shadow (RGBColor | None): Header text shadow color
+                override.
+            color_arrow (RGBColor | None): Arrow indicator color override.
 
         Raises:
             ValueError: If options is empty, or if value is provided but is not
@@ -691,39 +739,19 @@ class Dropdown:
         self.x = x
         self.y = y
         self.options = options
-        self.width = width if width is not None else _config_dropdown.width
-        self.height = height if height is not None else _config_dropdown.height
-
-        self.option_height = (
-            option_height
-            if option_height is not None
-            else _config_dropdown.option_height
-        )
-
-        self.font = _create_font(
-            font_name=font_name,
-            font_size=font_size,
-            default_font_name=_config_dropdown.font_name,
-            default_font_size=_config_dropdown.font_size,
-        )
-
+        self._width = width
+        self._height = height
+        self._option_height = option_height
+        self._font_name = font_name
+        self._font_size = font_size
+        self._font: pg.font.Font | None = None
+        self._font_key: tuple[str, int] | None = None
         self.border_width = border_width
         self.border_width_inner = border_width_inner
         self.text_shadow_offset = text_shadow_offset
         self.arrow_size = arrow_size
-
-        self.color_background_active = (
-            color_background_active
-            if color_background_active is not None
-            else _config_dropdown.color_background_active
-        )
-
-        self.color_background_inactive = (
-            color_background_inactive
-            if color_background_inactive is not None
-            else _config_dropdown.color_background_inactive
-        )
-
+        self._color_background_active = color_background_active
+        self._color_background_inactive = color_background_inactive
         self.color_background_option = color_background_option
         self.color_background_option_hover = color_background_option_hover
         self.color_text = color_text
@@ -733,15 +761,94 @@ class Dropdown:
         self.color_text_shadow = color_text_shadow
         self.color_arrow = color_arrow
 
-        # Definitions depending on function/config input.
-        self.rect = pg.Rect(self.x, self.y, self.width, self.height)
-
         # State.
         self.value = value if value is not None else self.options[0]
         self.is_open = False
         self._pressed = False
         self._hovered_index: int | None = None
         self._header_hovered = False
+
+    @property
+    def width(self) -> int:
+        """Header and option width in pixels: the override if given, otherwise
+        the style value.
+        """
+
+        style = get_style()
+        width = resolve_override(self._width, style.dropdown.width)
+
+        return width
+
+    @property
+    def height(self) -> int:
+        """Header height in pixels: the override if given, otherwise the style
+        value.
+        """
+
+        style = get_style()
+        height = resolve_override(self._height, style.dropdown.height)
+
+        return height
+
+    @property
+    def option_height(self) -> int:
+        """Option row height in pixels: the override if given, otherwise the
+        style value.
+        """
+
+        style = get_style()
+        option_height = resolve_override(
+            self._option_height, style.dropdown.option_height
+        )
+
+        return option_height
+
+    @property
+    def rect(self) -> pg.Rect:
+        """The header's bounding rectangle, from its current size and position."""
+
+        rect = pg.Rect(self.x, self.y, self.width, self.height)
+
+        return rect
+
+    @property
+    def font(self) -> pg.font.Font:
+        """The font for the header and option labels, recreated only when the
+        name or size changes.
+        """
+
+        style = get_style()
+        font_name = resolve_override(self._font_name, style.dropdown.font_name)
+        font_size = resolve_override(self._font_size, style.dropdown.font_size)
+        font_key = (font_name, font_size)
+
+        if self._font is None or self._font_key != font_key:
+            self._font = _create_font(font_name=font_name, font_size=font_size)
+            self._font_key = font_key
+
+        return self._font
+
+    def _header_background(self) -> RGBColor:
+        """Return the header background for the current open state.
+
+        Returns:
+            color (RGBColor): The active color while open, otherwise the
+                inactive color.
+        """
+
+        style = get_style()
+
+        if self.is_open:
+            color = resolve_override(
+                self._color_background_active, style.dropdown.color_background_active
+            )
+        else:
+            color = resolve_override(
+                self._color_background_inactive,
+                style.dropdown.color_background_inactive,
+            )
+
+        return color
 
     def _get_options_rect(self) -> pg.Rect:
         """Compute the bounding rect of the open option list.
@@ -783,6 +890,10 @@ class Dropdown:
         of being drawn beneath.
         """
 
+        style = get_style()
+        hovered = self._header_hovered and style.hover
+        color_background = self._header_background()
+
         draw.dropdown_header(
             surface=self.surface,
             x=self.x,
@@ -796,12 +907,8 @@ class Dropdown:
             border_width_inner=self.border_width_inner,
             text_shadow_offset=self.text_shadow_offset,
             arrow_size=self.arrow_size,
-            color_background=(
-                self.color_background_active
-                if self.is_open
-                else self.color_background_inactive
-            ),
-            hovered=self._header_hovered,
+            color_background=color_background,
+            hovered=hovered,
             color_text=self.color_text,
             color_border=self.color_border,
             color_border_inner_light=self.color_border_inner_light,

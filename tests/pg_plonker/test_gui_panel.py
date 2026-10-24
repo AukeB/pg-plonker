@@ -4,6 +4,7 @@ import pygame as pg
 
 from pg_plonker.controls import Button, Dropdown
 from pg_plonker.gui_panel import GUIPanel
+from pg_plonker.styles import get_style
 
 
 def _mouse_down(pos: tuple[int, int]) -> pg.event.Event:
@@ -229,7 +230,7 @@ def test_release_outside_the_panel_ends_a_button_press(screen: pg.Surface) -> No
     light_bevel = screen.get_at((800 - 620 + 40 + 100, 40 + 6))
 
     assert button.value is False
-    assert tuple(light_bevel)[:3] == (198, 198, 198)
+    assert tuple(light_bevel)[:3] == get_style().button.color_border_inner_light
 
 
 def test_release_outside_the_panel_ends_a_slider_drag(screen: pg.Surface) -> None:

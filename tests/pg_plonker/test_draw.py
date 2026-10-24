@@ -17,7 +17,7 @@ def test_button_fills_background_with_given_color(
     assert tuple(pixel)[:3] == (10, 20, 30)
 
 
-def test_button_uses_config_defaults_when_no_overrides(
+def test_button_uses_style_defaults_when_no_overrides(
     screen: pg.Surface, font: pg.font.Font
 ) -> None:
     draw.button(surface=screen, font=font, x=20, y=20)
@@ -56,6 +56,7 @@ def test_button_pressed_does_not_move_the_button(
         x=20,
         y=20,
         color_background=(10, 20, 30),
+        color_border=(0, 0, 0),
         pressed=True,
     )
 

@@ -56,7 +56,7 @@ def _mouse_motion(pos: tuple[int, int]) -> pg.event.Event:
 # Testing the "__init__" method from the "Button" class.
 
 
-def test_button_init_uses_config_size_and_starts_inactive(screen: pg.Surface) -> None:
+def test_button_init_uses_style_size_and_starts_inactive(screen: pg.Surface) -> None:
     button = Button(surface=screen, x=20, y=20)
 
     assert (button.width, button.height) == (540, 108)
@@ -649,3 +649,14 @@ def test_font_uses_the_requested_name_and_size(screen: pg.Surface) -> None:
     button = Button(surface=screen, x=20, y=20, font_name="arial", font_size=20)
 
     assert isinstance(button.font, pg.font.Font)
+
+
+# Testing the "font" property from the "Slider" class.
+
+
+def test_slider_font_is_reused_until_the_name_or_size_changes(screen: pg.Surface) -> None:
+    slider = Slider(surface=screen, x=20, y=40, start=0, stop=10)
+
+    first_font = slider.font
+
+    assert slider.font is first_font

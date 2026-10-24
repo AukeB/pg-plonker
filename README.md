@@ -95,7 +95,7 @@ draw.button(
 )
 ```
 
-All visual parameters are optional and fall back to `ButtonConfig` defaults, but can be overridden per call:
+All visual parameters are optional and fall back to the active style, but can be overridden per call:
 
 ```python
 draw.button(
@@ -184,7 +184,7 @@ And draw it each frame, after clearing the screen and before flipping the displa
 panel.draw()
 ```
 
-Panel appearance is controlled by `GUIPanelConfig`, which has sensible defaults and can be overridden per instance:
+Panel appearance comes from the active style, and the layout options are plain arguments that can be set per instance:
 
 ```python
 panel = GUIPanel(surface=screen, width=300, color_background=(20, 20, 20))
@@ -192,16 +192,21 @@ panel = GUIPanel(surface=screen, width=300, color_background=(20, 20, 20))
 
 ---
 
-## Configuration
+## Styles
 
-Visual and layout defaults for `Button` and `GUIPanel` live in `gui_config_models.py`, as frozen dataclasses:
+The look of every control comes from the active style. The default style is `embossed`, with raised 3D controls and light/dark bevels. Its values are defined in `src/pg_plonker/styles/embossed.py`.
 
-- `ButtonConfig` — text, font, sizing, borders, and colors for both active and inactive states.
-- `SliderConfig` — slider track, handle, and value display.
-- `DropdownConfig` — dropdown header and options list styling.
-- `GUIPanelConfig` — panel width, border, margins, alignment, and colors.
+Every control and draw function reads the active style, so a call to `set_style()` changes all of them:
 
-Every parameter on `Button`, `GUIPanel`, and `draw.button` is optional and falls back to these defaults; pass any subset of them to override.
+```python
+import pg_plonker as pgp
+
+pgp.set_style("embossed")
+```
+
+Each style sets every value in the `Style` dataclass and its element groups, so a style is always complete. Passing a value to a constructor, such as `Button(..., color_text=(0, 0, 0))`, overrides the style for that control. Arguments left out follow the active style.
+
+Layout options such as the panel's `width`, `margin_gui_panel`, `margin_button` and `align_right` are plain arguments of `GUIPanel`, not part of a style.
 
 ---
 
@@ -210,6 +215,6 @@ Every parameter on `Button`, `GUIPanel`, and `draw.button` is optional and falls
 pg-plonker is under active development. A prioritized list of what's planned but not yet built lives in [`TODO.md`](TODO.md):
 
 - Button press animations and click sound effects
-- A pre-made visual style system (`set_style`)
 - A pluggable layout mode system (`set_mode`), generalizing what `GUIPanel` does today
+- More styles (`flat`, `chalk`, `terminal`, `soft`)
 - PyPI publishing
