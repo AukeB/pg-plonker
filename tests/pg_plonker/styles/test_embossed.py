@@ -17,3 +17,10 @@ def test_embossed_has_raised_bevels_with_light_above_dark() -> None:
 
 def test_embossed_is_not_rounded() -> None:
     assert EMBOSSED.rounded is False
+
+
+def test_embossed_button_on_and_off_backgrounds_are_clearly_different() -> None:
+    on = EMBOSSED.button.color_background_active
+    off = EMBOSSED.button.color_background_inactive
+
+    assert all(abs(a - b) >= 40 for a, b in zip(on, off, strict=True))

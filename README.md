@@ -194,7 +194,11 @@ panel = GUIPanel(surface=screen, width=300, color_background=(20, 20, 20))
 
 ## Styles
 
-The look of every control comes from the active style. The default style is `embossed`, with raised 3D controls and light/dark bevels. Its values are defined in `src/pg_plonker/styles/embossed.py`.
+The look of every control comes from the active style. The default style is `embossed`.
+
+Available styles:
+
+- `"embossed"` (default): raised 3D controls with light and dark bevels. Its values are defined in `src/pg_plonker/styles/embossed.py`.
 
 Every control and draw function reads the active style, so a call to `set_style()` changes all of them:
 
