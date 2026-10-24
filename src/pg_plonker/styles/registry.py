@@ -11,10 +11,14 @@ from pg_plonker.errors import StyleNotFoundError
 from pg_plonker.styles.embossed import EMBOSSED
 from pg_plonker.styles.flat import FLAT
 from pg_plonker.styles.models import Style
+from pg_plonker.styles.soft import SOFT
+from pg_plonker.styles.terminal import TERMINAL
 
 _STYLES: dict[str, Style] = {
     "embossed": EMBOSSED,
     "flat": FLAT,
+    "soft": SOFT,
+    "terminal": TERMINAL,
 }
 
 _active_style: Style = _STYLES[DEFAULT_STYLE]

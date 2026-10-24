@@ -70,8 +70,8 @@ See `docs/style_design.md` for the full design.
 - [x] Implement `"embossed"` style (default) — raised 3D buttons with light/dark bevels.
 - [x] Implement `"flat"` style — no borders or bevels, hover off.
 - [ ] Implement `"chalk"` style — dark background, muted tones, rounded corners.
-- [ ] Implement `"terminal"` style — monospace font (`SysFont` with common monospace names), green on black.
-- [ ] Implement `"soft"` style — light pastel colours, subtle shadows.
+- [x] Implement `"terminal"` style — monospace font (`SysFont` with common monospace names), green on black.
+- [x] Implement `"soft"` style — light pastel colours, subtle shadows.
 - [x] Implement `set_style()` and the style registry. It sets the active global style, which applies to all controls and draw calls, including ones created before the call.
 - [ ] Controls, draw functions and `GUIPanel` read the active style at draw and event time. Explicit arguments given at construction override it until the next `set_style()` call.
   - Done: controls, draw functions and `GUIPanel` read the active style at draw time, so an existing control follows a later `set_style()` call.

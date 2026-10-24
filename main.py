@@ -31,7 +31,7 @@ def main() -> None:
     screen = pg.display.set_mode(window_size)
     pg.display.set_caption("PyGame Plonker Testing")
 
-    set_style("embossed")
+    set_style("terminal")
 
     panel = GUIPanel(surface=screen)
 

@@ -7,4 +7,6 @@ WINDOW_SIZE_SCREEN_FRACTION = 0.9
 # Must be a name registered in pg_plonker/styles/registry.py. Available styles:
 #   "embossed"
 #   "flat"
+#   "soft"
+#   "terminal"
 DEFAULT_STYLE = "embossed"

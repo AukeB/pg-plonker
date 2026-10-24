@@ -11,6 +11,8 @@ from pg_plonker.errors import StyleNotFoundError
 from pg_plonker.styles.registry import _STYLES, get_style, set_style
 from pg_plonker.styles.embossed import EMBOSSED
 from pg_plonker.styles.flat import FLAT
+from pg_plonker.styles.soft import SOFT
+from pg_plonker.styles.terminal import TERMINAL
 
 
 @pytest.fixture(name="restore_style", autouse=True)
@@ -67,3 +69,11 @@ def test_set_style_can_select_flat() -> None:
     set_style("flat")
 
     assert get_style() is FLAT
+
+
+def test_set_style_can_select_terminal_and_soft() -> None:
+    set_style("terminal")
+    assert get_style() is TERMINAL
+
+    set_style("soft")
+    assert get_style() is SOFT

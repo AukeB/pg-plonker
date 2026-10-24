@@ -200,6 +200,8 @@ Available styles:
 
 - `"embossed"` (default): raised 3D controls with light and dark bevels. Its values are defined in `src/pg_plonker/styles/embossed.py`.
 - `"flat"`: no borders or bevels, and no hover or press effects. Its values are defined in `src/pg_plonker/styles/flat.py`.
+- `"terminal"`: monospace text, green on black, with green borders. Its values are defined in `src/pg_plonker/styles/terminal.py`.
+- `"soft"`: light pastel colours, subtle text shadows and gentle hover. Its values are defined in `src/pg_plonker/styles/soft.py`.
 
 Every control and draw function reads the active style, so a call to `set_style()` changes all of them:
 
