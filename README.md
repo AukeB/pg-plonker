@@ -223,6 +223,5 @@ Layout options such as the panel's `width`, `margin_gui_panel`, `margin_button` 
 pg-plonker is under active development. A prioritized list of what's planned but not yet built lives in [`TODO.md`](TODO.md):
 
 - Button press animations and click sound effects
-- A pluggable layout mode system (`set_mode`), generalizing what `GUIPanel` does today
 - More styles (`flat`, `chalk`, `terminal`, `soft`)
 - PyPI publishing

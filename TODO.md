@@ -76,16 +76,9 @@ See `docs/style_design.md` for the full design.
 - [x] Controls, draw functions and `GUIPanel` read the active style at draw and event time. Explicit arguments given at construction are permanent overrides for that control, while `set_style()` changes every other setting.
 - [x] Tests: every style sets every field, and an unknown style name raises `StyleNotFoundError`. Checks over every registered style run automatically, so new styles are covered.
 
-## 4. Layout mode system (`set_mode`)
+## 4. Layout mode system (dropped)
 
-Today `GUIPanel` is the only way to arrange controls. A layout mode chooses where and how controls are placed, so `GUIPanel` becomes one mode among others (e.g. a top bar, a row, a grid or a floating window). The user selects a mode by name, for example `pgp.set_mode("panel", align="right")`, and then adds controls the same way regardless of the mode.
-
-- [ ] Define a common `Mode` interface/protocol that layout containers implement (adding a control, handling events, drawing).
-- [ ] Refactor `GUIPanel` to conform to the `Mode` interface.
-- [ ] Implement `set_mode()` to select and activate a mode by name.
-- [ ] Decouple adding controls from being hardcoded to `GUIPanel` specifically, so `add_button` etc. work in any mode.
-- [ ] Design how mode-specific config (e.g. `GUIPanelConfig`) gets passed through `set_mode()`.
-- [ ] Support multiple simultaneously active modes/panels (e.g. a left and a right panel).
+Dropped. Controls are placed either manually on the pygame window or through `GUIPanel`, and no other layouts are planned. A global `set_mode()` was rejected: with only one layout it adds indirection without benefit, and it conflicts with using several panels at once.
 
 ## 5. Top-level ergonomic API
 
@@ -93,7 +86,6 @@ Today `GUIPanel` is the only way to arrange controls. A layout mode chooses wher
 - [x] Export `Button`, `Dropdown`, `Slider`, `GUIPanel`, and `draw` from `__init__.py`.
 - [x] Document the `import pg_plonker as pgp` convention in `README.md`.
 - [x] Export `set_style` from `__init__.py`.
-- [ ] Export `set_mode` from `__init__.py` once implemented.
 - [x] Add an `__all__` list to `__init__.py` to make the public surface explicit.
 
 ## 6. PyPI publishing
