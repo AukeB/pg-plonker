@@ -1,8 +1,4 @@
-"""Module for the embossed style, the default style.
-
-Constants: - EMBOSSED: The embossed style, with raised 3D controls and
-light/dark bevels.
-"""
+"""Module for the embossed style, the default style."""
 
 from pg_plonker.styles.models import (
     ButtonStyle,

@@ -49,7 +49,8 @@ def _draw_bevelled_box(
     """
 
     pg.draw.rect(surface, color_background, rect)
-    pg.draw.rect(surface, color_border, rect, border_width)
+    if border_width > 0:
+        pg.draw.rect(surface, color_border, rect, border_width)
 
     inner_rect = rect.inflate(-border_width * 2, -border_width * 2)
     pg.draw.line(
@@ -471,7 +472,10 @@ def slider(
     pg.draw.rect(surface, color_track, track_rect)
     pg.draw.rect(surface, color_track_filled, track_filled_rect)
     pg.draw.circle(surface, color_handle, handle_center, handle_radius)
-    pg.draw.circle(surface, color_border, handle_center, handle_radius, border_width)
+    if border_width > 0:
+        pg.draw.circle(
+            surface, color_border, handle_center, handle_radius, border_width
+        )
 
     if show_value:
         text_surface = font.render(f"{value:.{precision}f}", True, color_text)
@@ -822,4 +826,5 @@ def dropdown_options(
         option_height * len(options) + border_width,
     )
 
-    pg.draw.rect(surface, color_border, options_rect, border_width)
+    if border_width > 0:
+        pg.draw.rect(surface, color_border, options_rect, border_width)

@@ -68,7 +68,7 @@ See `docs/style_design.md` for the full design.
 - [x] Add `errors.py` with `StyleNotFoundError`.
 - [x] Add `DEFAULT_STYLE` to `constants.py`.
 - [x] Implement `"embossed"` style (default) — raised 3D buttons with light/dark bevels.
-- [ ] Implement `"flat"` style — no borders or bevels, hover off.
+- [x] Implement `"flat"` style — no borders or bevels, hover off.
 - [ ] Implement `"chalk"` style — dark background, muted tones, rounded corners.
 - [ ] Implement `"terminal"` style — monospace font (`SysFont` with common monospace names), green on black.
 - [ ] Implement `"soft"` style — light pastel colours, subtle shadows.

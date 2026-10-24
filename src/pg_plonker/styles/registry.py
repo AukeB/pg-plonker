@@ -9,10 +9,12 @@ Functions:
 from pg_plonker.constants import DEFAULT_STYLE
 from pg_plonker.errors import StyleNotFoundError
 from pg_plonker.styles.embossed import EMBOSSED
+from pg_plonker.styles.flat import FLAT
 from pg_plonker.styles.models import Style
 
 _STYLES: dict[str, Style] = {
     "embossed": EMBOSSED,
+    "flat": FLAT,
 }
 
 _active_style: Style = _STYLES[DEFAULT_STYLE]

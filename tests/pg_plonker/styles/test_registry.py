@@ -10,6 +10,7 @@ from pg_plonker.controls import Button
 from pg_plonker.errors import StyleNotFoundError
 from pg_plonker.styles.registry import _STYLES, get_style, set_style
 from pg_plonker.styles.embossed import EMBOSSED
+from pg_plonker.styles.flat import FLAT
 
 
 @pytest.fixture(name="restore_style", autouse=True)
@@ -60,3 +61,9 @@ def test_existing_controls_follow_a_later_set_style(
 
 def test_get_style_starts_as_the_default_style() -> None:
     assert get_style() is EMBOSSED
+
+
+def test_set_style_can_select_flat() -> None:
+    set_style("flat")
+
+    assert get_style() is FLAT

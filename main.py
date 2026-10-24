@@ -6,6 +6,7 @@ Functions:
 
 import pygame as pg
 
+from pg_plonker import set_style
 from pg_plonker.gui_panel import GUIPanel
 from pg_plonker.utils import get_window_size_from_screen_resolution
 
@@ -29,6 +30,8 @@ def main() -> None:
     window_size = get_window_size_from_screen_resolution()
     screen = pg.display.set_mode(window_size)
     pg.display.set_caption("PyGame Plonker Testing")
+
+    set_style("embossed")
 
     panel = GUIPanel(surface=screen)
 

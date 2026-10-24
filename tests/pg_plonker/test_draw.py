@@ -461,3 +461,74 @@ def test_slider_value_readout_stays_inside_the_box_padding_at_the_left_end(
 
     assert readout_pixels
     assert min(readout_pixels) >= box_left + padding
+
+
+def test_button_with_zero_border_width_draws_no_outline(screen: pg.Surface, font: pg.font.Font) -> None:
+    screen.fill((255, 255, 255))
+
+    draw.button(
+        surface=screen,
+        font=font,
+        x=20,
+        y=20,
+        color_background=(10, 20, 30),
+        color_border=(0, 0, 0),
+        border_width=0,
+        border_width_inner=0,
+    )
+
+    edge = screen.get_at((20 + 1, 20 + 54))
+
+    assert tuple(edge)[:3] == (10, 20, 30)
+
+
+def test_slider_handle_with_zero_border_width_draws_no_outline(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
+    screen.fill((255, 255, 255))
+
+    draw.slider(
+        surface=screen,
+        font=font,
+        width=300,
+        height=12,
+        handle_radius=10,
+        border_width=0,
+        color_handle=(240, 240, 240),
+        color_border=(0, 0, 0),
+        x=20,
+        y=100,
+        start=0,
+        stop=10,
+        value=5,
+        precision=1,
+        text=None,
+    )
+
+    handle_edge = screen.get_at((20 + 150 + 8, 100))
+
+    assert tuple(handle_edge)[:3] == (240, 240, 240)
+
+
+def test_dropdown_options_with_zero_border_width_draws_no_frame(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
+    screen.fill((255, 255, 255))
+
+    draw.dropdown_options(
+        surface=screen,
+        font=font,
+        x=20,
+        y=100,
+        options=["Easy"],
+        hovered_index=None,
+        width=200,
+        option_height=60,
+        border_width=0,
+        color_background_option=(8, 9, 10),
+        color_border=(0, 0, 0),
+    )
+
+    frame_edge = screen.get_at((20, 100 + 30))
+
+    assert tuple(frame_edge)[:3] == (8, 9, 10)
