@@ -45,6 +45,8 @@ Planned work for pg-plonker, sorted by priority (highest first). See `README.md`
 - [x] Implement `Slider` class (value, `handle_event`, `draw`).
 - [x] Add a `SliderConfig` default config model.
 - [x] Wire `Slider` into `GUIPanel.add_slider` for automatic layout.
+- [x] Add a `text` label to `Slider` (default `"Slider"`), drawn above the track, aligned with the handle's left edge, in a larger font than the value.
+- [x] Draw the slider inside a bevelled box that matches the button, holding the label, the value (when shown) and the track. The box is taller when the value is shown, and the panel moves the next control down by its height.
 - [x] Design `Dropdown` control API (options list, selected value, open/closed state).
 - [x] Implement `draw.dropdown` stateless drawing function (as `draw.dropdown_header` and `draw.dropdown_options`).
 - [x] Implement `Dropdown` class (value, `handle_event`, `draw`).
@@ -107,6 +109,10 @@ Today `GUIPanel` is the only way to arrange controls. A layout mode chooses wher
 ---
 
 ## Backlog
+
+### Must have
+
+- [ ] Text that is wider than its control overflows or gets cut off. This applies to every element that shows text: the Button label, the Dropdown header and option labels, and the Slider label. Choose one policy (shrink the font to fit, truncate with an ellipsis, or wrap onto several lines) and apply it to all of them.
 
 ### Nice to have
 

@@ -283,6 +283,10 @@ class Button:
 class Slider:
     """A stateful horizontal slider that delegates rendering to draw.slider.
 
+    The slider is drawn inside a bevelled box with its label at the top, the
+    value readout above the handle (when shown), and the track. The box height
+    depends on whether the value is shown, so a slider with a value is taller.
+
     Attributes:
         surface (Surface): The pygame surface the slider is drawn onto.
         x (int): X-position of the track's left edge in pixels.
@@ -292,6 +296,7 @@ class Slider:
         step (int | float | None): Increment the value snaps to when dragging.
         border_width (int | None): Handle border thickness in pixels.
         show_value (bool): Whether the current value is drawn above the handle.
+        text (str | None): Label drawn at the top of the box.
         value (int | float): The current value, within [start, stop].
 
     Example:
@@ -312,10 +317,9 @@ class Slider:
         value: int | float | None = None,
         step: int | float | None = None,
         width: int | None = None,
-        height: int | None = None,
+        track_height: int | None = None,
         handle_radius: int | None = None,
         border_width: int | None = None,
-        margin_vertical: int | None = None,
         font_name: str | None = None,
         font_size: int | None = None,
         extra_decimal_places: int | None = None,
@@ -325,9 +329,10 @@ class Slider:
         color_handle: RGBColor | None = None,
         color_border: RGBColor | None = None,
         color_text: RGBColor | None = None,
+        text: str | None = "Slider",
     ) -> None:
-        """Initialize a Slider instance with rendering surface, position, range,
-        and visual overrides.
+        """Initialize a Slider instance with rendering surface, track position,
+        range, and visual overrides.
 
         Any argument left as None follows the active style, and is read again
         each time the slider is used.
@@ -345,15 +350,13 @@ class Slider:
             step (int | float | None): Increment the value snaps to when
                 dragging. If None, the value is continuous, limited only by the
                 precision.
-            width (int | None): Track width override in pixels.
-            height (int | None): Track height override in pixels.
+            width (int | None): Track length override in pixels.
+            track_height (int | None): Track thickness override in pixels.
             handle_radius (int | None): Handle radius override in pixels.
             border_width (int | None): Handle border thickness override in
                 pixels.
-            margin_vertical (int | None): Vertical spacing override reserved
-                above and below the track when laid out in a GUIPanel.
             font_name (str | None): System font name override.
-            font_size (int | None): Font size override in points.
+            font_size (int | None): Font size override in points for the value.
             extra_decimal_places (int | None): Decimal places override added on
                 top of the precision implied by start/stop/step.
             show_value (bool): Whether to render the current value above the
@@ -363,7 +366,10 @@ class Slider:
                 portion of the track.
             color_handle (RGBColor | None): Handle fill color override.
             color_border (RGBColor | None): Handle border color override.
-            color_text (RGBColor | None): Value readout color override.
+            color_text (RGBColor | None): Label and value readout color
+                override.
+            text (str | None): Label drawn at the top of the box. Pass None for
+                no label.
 
         Raises:
             ValueError: If start is not strictly less than stop, or if value
@@ -384,14 +390,15 @@ class Slider:
         self.stop = stop
         self.step = step
         self._width = width
-        self._height = height
+        self._track_height = track_height
         self._handle_radius = handle_radius
         self.border_width = border_width
-        self._margin_vertical = margin_vertical
         self._font_name = font_name
         self._font_size = font_size
         self._font: pg.font.Font | None = None
         self._font_key: tuple[str, int] | None = None
+        self._label_font: pg.font.Font | None = None
+        self._label_font_key: tuple[str, int] | None = None
         self._extra_decimal_places = extra_decimal_places
         self.show_value = show_value
         self.color_track = color_track
@@ -399,6 +406,7 @@ class Slider:
         self.color_handle = color_handle
         self.color_border = color_border
         self.color_text = color_text
+        self.text = text
 
         # State.
         self.value = round(value if value is not None else self.start, self._precision)
@@ -407,7 +415,7 @@ class Slider:
 
     @property
     def width(self) -> int:
-        """Track width in pixels: the override if given, otherwise the style
+        """Track length in pixels: the override if given, otherwise the style
         value.
         """
 
@@ -417,15 +425,15 @@ class Slider:
         return width
 
     @property
-    def height(self) -> int:
-        """Track height in pixels: the override if given, otherwise the style
+    def track_height(self) -> int:
+        """Track thickness in pixels: the override if given, otherwise the style
         value.
         """
 
         style = get_style()
-        height = resolve_override(self._height, style.slider.height)
+        track_height = resolve_override(self._track_height, style.slider.height)
 
-        return height
+        return track_height
 
     @property
     def handle_radius(self) -> int:
@@ -441,25 +449,21 @@ class Slider:
         return handle_radius
 
     @property
-    def margin_vertical(self) -> int:
-        """Vertical spacing around the track: the override if given, otherwise
-        the style value.
-        """
+    def padding(self) -> int:
+        """Space between the box edge and its contents, from the style."""
 
         style = get_style()
-        margin_vertical = resolve_override(
-            self._margin_vertical, style.slider.margin_vertical
-        )
+        padding = style.slider.padding
 
-        return margin_vertical
+        return padding
 
     @property
-    def rect(self) -> pg.Rect:
-        """The track's bounding rectangle, centred vertically on y."""
+    def inset(self) -> int:
+        """Horizontal room the box adds on each side of the track."""
 
-        rect = pg.Rect(self.x, self.y - self.height // 2, self.width, self.height)
+        inset = self.padding + self.handle_radius
 
-        return rect
+        return inset
 
     @property
     def font(self) -> pg.font.Font:
@@ -479,6 +483,58 @@ class Slider:
         return self._font
 
     @property
+    def label_font(self) -> pg.font.Font:
+        """The font for the label, recreated only when the name or size changes."""
+
+        style = get_style()
+        font_name = resolve_override(self._font_name, style.slider.font_name)
+        font_size = style.slider.label_font_size
+        font_key = (font_name, font_size)
+
+        if self._label_font is None or self._label_font_key != font_key:
+            self._label_font = _create_font(font_name=font_name, font_size=font_size)
+            self._label_font_key = font_key
+
+        return self._label_font
+
+    @property
+    def layout(self) -> draw.SliderLayout:
+        """Where the label, value readout and track sit inside the box."""
+
+        label_height = (
+            self.label_font.size(self.text)[1] if self.text is not None else 0
+        )
+        readout_height = self.font.size("0")[1] if self.show_value else 0
+        layout = draw.slider_layout(
+            self.padding, self.handle_radius, label_height, readout_height
+        )
+
+        return layout
+
+    @property
+    def height(self) -> int:
+        """Height of the box in pixels, which depends on whether the value is
+        shown.
+        """
+
+        height = self.layout.height
+
+        return height
+
+    @property
+    def rect(self) -> pg.Rect:
+        """The box's bounding rectangle, from its position and current layout."""
+
+        rect = pg.Rect(
+            self.x - self.inset,
+            self.y - self.layout.track_center,
+            self.width + 2 * self.inset,
+            self.height,
+        )
+
+        return rect
+
+    @property
     def _precision(self) -> int:
         """Decimal places used to round values.
 
@@ -490,7 +546,6 @@ class Slider:
         extra_decimal_places = resolve_override(
             self._extra_decimal_places, style.slider.extra_decimal_places
         )
-
         start_decimals = count_decimal_places(self.start)
         stop_decimals = count_decimal_places(self.stop)
         step_decimals = count_decimal_places(self.step) if self.step is not None else 0
@@ -498,6 +553,17 @@ class Slider:
         precision = largest_decimals + extra_decimal_places
 
         return precision
+
+    def place(self, left: int, top: int) -> None:
+        """Position the box so its top-left corner is at the given point.
+
+        Args:
+            left (int): X-position of the box's left edge, in panel-local space.
+            top (int): Y-position of the box's top edge, in panel-local space.
+        """
+
+        self.x = left + self.inset
+        self.y = top + self.layout.track_center
 
     def _get_handle_center(self) -> tuple[int, int]:
         """Compute the current pixel center of the handle from self.value.
@@ -547,7 +613,9 @@ class Slider:
         return value
 
     def draw(self) -> None:
-        """Draw the slider reflecting the current value and hover state."""
+        """Draw the box, label, value readout and track, with the handle's hover
+        state.
+        """
 
         style = get_style()
         hovered = self._hovered and style.hover
@@ -561,7 +629,7 @@ class Slider:
             value=self.value,
             precision=self._precision,
             width=self.width,
-            height=self.height,
+            height=self.track_height,
             handle_radius=self.handle_radius,
             border_width=self.border_width,
             font=self.font,
@@ -572,6 +640,8 @@ class Slider:
             hovered=hovered,
             color_border=self.color_border,
             color_text=self.color_text,
+            text=self.text,
+            label_font=self.label_font,
         )
 
     def handle_event(self, event: pg.event.Event) -> None:

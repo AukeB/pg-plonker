@@ -264,10 +264,9 @@ class GUIPanel:
         value: int | float | None = None,
         step: int | float | None = None,
         width: int | None = None,
-        height: int | None = None,
+        track_height: int | None = None,
         handle_radius: int | None = None,
         border_width: int | None = None,
-        margin_vertical: int | None = None,
         font_name: str | None = None,
         font_size: int | None = None,
         extra_decimal_places: int | None = None,
@@ -277,6 +276,7 @@ class GUIPanel:
         color_handle: RGBColor | None = None,
         color_border: RGBColor | None = None,
         color_text: RGBColor | None = None,
+        text: str | None = "Slider",
     ) -> Slider:
         """Create a Slider, register it with the panel, and assign automatic
         layout.
@@ -298,12 +298,10 @@ class GUIPanel:
                 None.
             step (int | float | None): Increment the value snaps to when
                 dragging. If None, the value is continuous.
-            width (int | None): Track width in pixels.
-            height (int | None): Track height in pixels.
+            width (int | None): Track length in pixels.
+            track_height (int | None): Track thickness in pixels.
             handle_radius (int | None): Handle circle radius in pixels.
             border_width (int | None): Handle border thickness in pixels.
-            margin_vertical (int | None): Vertical spacing reserved above and
-                below the slider track, separating it from neighboring controls.
             font_name (str | None): Font family used for the value readout.
             font_size (int | None): Font size in points.
             extra_decimal_places (int | None): Number of decimal places added on
@@ -315,6 +313,8 @@ class GUIPanel:
             color_handle (RGBColor | None): Handle fill color.
             color_border (RGBColor | None): Handle border color.
             color_text (RGBColor | None): Value readout text color.
+            text (str | None): Label drawn above the slider, starting at its
+                left edge. Pass None for no label.
 
         Returns:
             Slider: The created and layout-managed slider instance.
@@ -332,10 +332,9 @@ class GUIPanel:
             value=value,
             step=step,
             width=width,
-            height=height,
+            track_height=track_height,
             handle_radius=handle_radius,
             border_width=border_width,
-            margin_vertical=margin_vertical,
             font_name=font_name,
             font_size=font_size,
             extra_decimal_places=extra_decimal_places,
@@ -345,24 +344,17 @@ class GUIPanel:
             color_handle=color_handle,
             color_border=color_border,
             color_text=color_text,
+            text=text,
         )
 
-        slider_x = (self.width - slider.rect.width) // 2
+        slider_left = (self.width - slider.rect.width) // 2
 
-        slider_y = (
-            self._next_control_y + slider.margin_vertical + slider.rect.height // 2
-        )
-
-        slider.x = slider_x
-        slider.y = slider_y
+        slider.place(left=slider_left, top=self._next_control_y)
 
         # Advance layout cursor for next GUI element that will be placed. The
-        # slider reserves margin_vertical spacing both above and below its
-        # track, on top of the panel's regular margin_button spacing, since
-        # its track height is small relative to other controls.
-        self._next_control_y += (
-            slider.margin_vertical * 2 + slider.rect.height + self.margin_button
-        )
+        # slider's box is taller when its value is shown, so the next control
+        # moves down by the box's own height.
+        self._next_control_y += slider.height + self.margin_button
 
         # Register control
         self._controls.append(slider)

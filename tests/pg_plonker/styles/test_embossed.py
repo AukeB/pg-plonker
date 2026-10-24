@@ -24,3 +24,14 @@ def test_embossed_button_on_and_off_backgrounds_are_clearly_different() -> None:
     off = EMBOSSED.button.color_background_inactive
 
     assert all(abs(a - b) >= 40 for a, b in zip(on, off, strict=True))
+
+
+def test_embossed_dropdown_header_on_and_off_backgrounds_are_clearly_different() -> None:
+    open_color = EMBOSSED.dropdown.color_background_active
+    closed_color = EMBOSSED.dropdown.color_background_inactive
+
+    assert all(abs(a - b) >= 40 for a, b in zip(open_color, closed_color, strict=True))
+
+
+def test_embossed_slider_label_is_larger_than_the_value() -> None:
+    assert EMBOSSED.slider.label_font_size > EMBOSSED.slider.font_size

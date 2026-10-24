@@ -3,7 +3,9 @@
 import pygame as pg
 import pytest
 
+from pg_plonker import draw
 from pg_plonker.controls import Button, Dropdown, Slider
+from pg_plonker.styles import get_style
 
 
 def _mouse_down(pos: tuple[int, int], button: int = 1) -> pg.event.Event:
@@ -287,7 +289,7 @@ def test_slider_precision_includes_step_decimals(screen: pg.Surface) -> None:
 
 
 def test_handle_center_is_proportional_to_value(screen: pg.Surface) -> None:
-    slider = Slider(surface=screen, x=20, y=40, start=0, stop=10, value=5)
+    slider = Slider(surface=screen, width=540, x=20, y=40, start=0, stop=10, value=5)
 
     assert slider._get_handle_center() == (20 + 270, 40)
 
@@ -296,7 +298,7 @@ def test_handle_center_is_proportional_to_value(screen: pg.Surface) -> None:
 
 
 def test_value_from_x_maps_position_to_range(screen: pg.Surface) -> None:
-    slider = Slider(surface=screen, x=20, y=40, start=0, stop=10)
+    slider = Slider(surface=screen, width=540, x=20, y=40, start=0, stop=10)
 
     assert slider._get_value_from_x(20 + 135) == 2.5
 
@@ -309,7 +311,7 @@ def test_value_from_x_clamps_outside_the_track(screen: pg.Surface) -> None:
 
 
 def test_value_from_x_snaps_to_step(screen: pg.Surface) -> None:
-    slider = Slider(surface=screen, x=20, y=40, start=0, stop=10, step=1)
+    slider = Slider(surface=screen, x=20, y=40, width=540, start=0, stop=10, step=1)
 
     assert slider._get_value_from_x(20 + 166) == 3
 
@@ -374,7 +376,7 @@ def test_slider_handle_hover_ends_when_pointer_leaves(screen: pg.Surface) -> Non
 
 
 def test_slider_drag_updates_value_then_stops_on_release(screen: pg.Surface) -> None:
-    slider = Slider(surface=screen, x=20, y=40, start=0, stop=10, value=5)
+    slider = Slider(surface=screen, width=540, x=20, y=40, start=0, stop=10, value=5)
     handle_x, handle_y = slider._get_handle_center()
 
     event = _mouse_down((handle_x, handle_y))
@@ -403,7 +405,7 @@ def test_slider_press_away_from_handle_does_not_drag(screen: pg.Surface) -> None
 
 
 def test_slider_press_on_track_jumps_value_to_mouse(screen: pg.Surface) -> None:
-    slider = Slider(surface=screen, x=20, y=40, start=0, stop=10, value=5)
+    slider = Slider(surface=screen, width=540, x=20, y=40, start=0, stop=10, value=5)
 
     event = _mouse_down((20 + 162, 40))
     slider.handle_event(event)
@@ -660,3 +662,70 @@ def test_slider_font_is_reused_until_the_name_or_size_changes(screen: pg.Surface
     first_font = slider.font
 
     assert slider.font is first_font
+
+
+# Testing the "top_clearance" property from the "Slider" class.
+
+
+# Testing the "text" argument of the "Slider" class.
+
+
+def test_slider_text_defaults_to_slider(screen: pg.Surface) -> None:
+    slider = Slider(surface=screen, x=20, y=40, start=0, stop=10)
+
+    assert slider.text == "Slider"
+
+
+# Testing the "height" property from the "Slider" class.
+
+
+def test_height_is_padding_and_track_when_nothing_is_shown(screen: pg.Surface) -> None:
+    slider = Slider(surface=screen, x=20, y=40, start=0, stop=10, text=None)
+    style = get_style().slider
+
+    assert slider.height == 2 * style.padding + 2 * style.handle_radius
+
+
+def test_height_adds_the_label_when_text_is_given(screen: pg.Surface) -> None:
+    slider = Slider(surface=screen, x=20, y=40, start=0, stop=10, text="Speed")
+    style = get_style().slider
+    label_height = slider.label_font.size("Speed")[1]
+
+    assert slider.height == (
+        2 * style.padding
+        + 2 * style.handle_radius
+        + draw._LABEL_GAP
+        + label_height
+    )
+
+
+def test_height_grows_by_the_readout_when_the_value_is_shown(screen: pg.Surface) -> None:
+    hidden = Slider(surface=screen, x=20, y=40, start=0, stop=10, text=None)
+    shown = Slider(surface=screen, x=20, y=40, start=0, stop=10, show_value=True, text=None)
+    readout_height = shown.font.size("0")[1]
+
+    assert shown.height - hidden.height == draw._READOUT_GAP + readout_height
+
+
+# Testing the "place" method from the "Slider" class.
+
+
+def test_place_moves_the_box_top_left_corner_to_the_given_point(screen: pg.Surface) -> None:
+    slider = Slider(surface=screen, x=0, y=0, start=0, stop=10, text="Speed")
+
+    slider.place(left=30, top=50)
+
+    assert slider.rect.topleft == (30, 50)
+
+
+# Testing the spacing of the box around the "Slider" class.
+
+
+def test_slider_box_has_the_same_spacing_on_every_side(screen: pg.Surface) -> None:
+    slider = Slider(surface=screen, x=100, y=100, start=0, stop=10, show_value=True)
+    style = get_style().slider
+    inset = style.padding + slider.handle_radius
+
+    assert slider.x - slider.rect.left == inset
+    assert slider.rect.right - (slider.x + slider.width) == inset
+    assert slider.rect.bottom - (slider.y + slider.handle_radius) == style.padding

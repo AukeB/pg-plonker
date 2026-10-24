@@ -77,11 +77,18 @@ class SliderStyle:
     Attributes:
         font_name (str): System font name for the value readout.
         font_size (int): Font size of the value readout in points.
+        label_font_size (int): Font size of the label in points.
         width (int): Track width in pixels.
         height (int): Track height in pixels.
         handle_radius (int): Handle radius in pixels.
         border_width (int): Handle border thickness.
-        margin_vertical (int): Vertical space reserved around the track.
+        padding (int): Space between the box edge and its contents.
+        box_border_width (int): Outer border thickness of the box.
+        box_border_width_inner (int): Inner bevel thickness of the box.
+        color_box_background (RGBColor): Box background colour.
+        color_box_border (RGBColor): Box outer border colour.
+        color_box_border_inner_light (RGBColor): Box light bevel colour.
+        color_box_border_inner_dark (RGBColor): Box dark bevel colour.
         extra_decimal_places (int): Decimal places shown beyond the precision
             implied by start, stop and step.
         color_track (RGBColor): Track colour.
@@ -93,17 +100,24 @@ class SliderStyle:
 
     font_name: str
     font_size: int
+    label_font_size: int
     width: int
     height: int
     handle_radius: int
     border_width: int
-    margin_vertical: int
+    padding: int
+    box_border_width: int
+    box_border_width_inner: int
     extra_decimal_places: int
     color_track: RGBColor
     color_track_filled: RGBColor
     color_handle: RGBColor
     color_border: RGBColor
     color_text: RGBColor
+    color_box_background: RGBColor
+    color_box_border: RGBColor
+    color_box_border_inner_light: RGBColor
+    color_box_border_inner_dark: RGBColor
 
 
 @dataclass(frozen=True)

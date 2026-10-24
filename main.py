@@ -33,7 +33,7 @@ def main() -> None:
     panel = GUIPanel(surface=screen)
 
     button = panel.add_button()
-    slider = panel.add_slider(start=0, stop=10)
+    slider = panel.add_slider(start=0, stop=10, show_value=True)
     dropdown = panel.add_dropdown(options=[
         "Level 0",
         "Level 1",

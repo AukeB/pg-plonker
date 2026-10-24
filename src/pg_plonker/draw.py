@@ -7,12 +7,79 @@ Functions:
 - dropdown_options: Draw a dropdown's open option list onto the given surface.
 """
 
+from typing import NamedTuple
+
 import pygame as pg
 from pygame import Surface
 
 from pg_plonker.styles import get_style
 from pg_plonker.styles.models import RGBColor
 from pg_plonker.utils import lighten_color
+
+# Gap in pixels between the top of the handle and the value readout above it.
+_READOUT_GAP = 4
+
+# Gap in pixels above and below the slider label.
+_LABEL_GAP = 12
+
+
+def _draw_bevelled_box(
+    surface: Surface,
+    rect: pg.Rect,
+    color_background: RGBColor,
+    color_border: RGBColor,
+    border_width: int,
+    color_border_inner_light: RGBColor,
+    color_border_inner_dark: RGBColor,
+    border_width_inner: int,
+) -> None:
+    """Draw a filled rectangle with an outer border and light/dark inner bevel.
+
+    This is the same raised look the button uses.
+
+    Args:
+        surface (Surface): The pygame surface to draw onto.
+        rect (pg.Rect): The box's rectangle.
+        color_background (RGBColor): Fill colour.
+        color_border (RGBColor): Outer border colour.
+        border_width (int): Outer border thickness.
+        color_border_inner_light (RGBColor): Light bevel colour.
+        color_border_inner_dark (RGBColor): Dark bevel colour.
+        border_width_inner (int): Inner bevel thickness.
+    """
+
+    pg.draw.rect(surface, color_background, rect)
+    pg.draw.rect(surface, color_border, rect, border_width)
+
+    inner_rect = rect.inflate(-border_width * 2, -border_width * 2)
+    pg.draw.line(
+        surface,
+        color_border_inner_light,
+        inner_rect.topleft,
+        inner_rect.topright,
+        border_width_inner,
+    )
+    pg.draw.line(
+        surface,
+        color_border_inner_light,
+        inner_rect.topleft,
+        inner_rect.bottomleft,
+        border_width_inner,
+    )
+    pg.draw.line(
+        surface,
+        color_border_inner_dark,
+        inner_rect.bottomleft,
+        inner_rect.bottomright,
+        border_width_inner,
+    )
+    pg.draw.line(
+        surface,
+        color_border_inner_dark,
+        inner_rect.topright,
+        inner_rect.bottomright,
+        border_width_inner,
+    )
 
 
 def button(
@@ -139,8 +206,6 @@ def button(
 
     # Definitions depending on function/config input.
     rect = pg.Rect(x, y, width, height)
-    inner_rect = rect.inflate(-border_width * 2, -border_width * 2)
-
     # A pressed button reads as sunken, so its bevel light and dark swap.
     color_bevel_light = color_border_inner_light
     color_bevel_dark = color_border_inner_dark
@@ -149,38 +214,14 @@ def button(
         color_bevel_light, color_bevel_dark = color_bevel_dark, color_bevel_light
 
     # Drawing operations.
-    pg.draw.rect(surface, color_background, rect)
-    pg.draw.rect(surface, color_border, rect, border_width)
-
-    pg.draw.line(
+    _draw_bevelled_box(
         surface,
+        rect,
+        color_background,
+        color_border,
+        border_width,
         color_bevel_light,
-        inner_rect.topleft,
-        inner_rect.topright,
-        border_width_inner,
-    )
-
-    pg.draw.line(
-        surface,
-        color_bevel_light,
-        inner_rect.topleft,
-        inner_rect.bottomleft,
-        border_width_inner,
-    )
-
-    pg.draw.line(
-        surface,
         color_bevel_dark,
-        inner_rect.bottomleft,
-        inner_rect.bottomright,
-        border_width_inner,
-    )
-
-    pg.draw.line(
-        surface,
-        color_bevel_dark,
-        inner_rect.topright,
-        inner_rect.bottomright,
         border_width_inner,
     )
 
@@ -198,6 +239,53 @@ def button(
     text_surface = font.render(text, True, color_text)
     text_rect = text_surface.get_rect(center=rect.center)
     surface.blit(text_surface, text_rect)
+
+
+class SliderLayout(NamedTuple):
+    """Vertical positions of a slider's parts, measured from the box's top edge.
+
+    Attributes:
+        height (int): Height of the box in pixels.
+        track_center (int): Distance from the box's top to the track's centre.
+        readout_top (int): Distance from the box's top to the value readout.
+    """
+
+    height: int
+    track_center: int
+    readout_top: int
+
+
+def slider_layout(
+    padding: int, handle_radius: int, label_height: int, readout_height: int
+) -> SliderLayout:
+    """Work out where a slider's label, value readout and track sit in its box.
+
+    The label is at the top, then the value readout (when shown), then the
+    track. Gaps are only added next to parts that are present, so a slider with
+    no label or readout is no taller than its track needs.
+
+    Args:
+        padding (int): Space between the box edge and its contents.
+        handle_radius (int): Handle radius, which sets the track's vertical
+            room.
+        label_height (int): Height of the label, or 0 when there is no label.
+        readout_height (int): Height of the value readout, or 0 when not shown.
+
+    Returns:
+        layout (SliderLayout): The box height and the positions of its parts.
+    """
+
+    label_gap = _LABEL_GAP if label_height else 0
+    readout_top = padding + label_height + label_gap
+    readout_gap = _READOUT_GAP if readout_height else 0
+    track_top = readout_top + readout_height + readout_gap
+    track_center = track_top + handle_radius
+    height = track_top + 2 * handle_radius + padding
+    layout = SliderLayout(
+        height=height, track_center=track_center, readout_top=readout_top
+    )
+
+    return layout
 
 
 def slider(
@@ -221,13 +309,24 @@ def slider(
     color_text: RGBColor | None = None,
     hover_lighten: float | None = None,
     hovered: bool = False,
+    text: str | None = "Slider",
+    label_font: pg.font.Font | None = None,
+    padding: int | None = None,
+    box_border_width: int | None = None,
+    box_border_width_inner: int | None = None,
+    color_box_background: RGBColor | None = None,
+    color_box_border: RGBColor | None = None,
+    color_box_border_inner_light: RGBColor | None = None,
+    color_box_border_inner_dark: RGBColor | None = None,
 ) -> None:
-    """Draw a single horizontal slider onto the given surface.
+    """Draw a single horizontal slider inside a bevelled box.
+
+    The box holds the label (top), the value readout (when shown, above the
+    handle) and the track. Its width is the track width plus the room the handle
+    needs at each end. The box is drawn in the same style as a button.
 
     All parameters except surface, x, y, start, stop, value, and precision are
-    optional and fall back to the active style when not provided. This allows
-    quick usage with minimal arguments while still permitting per-call overrides
-    of any visual property.
+    optional and fall back to the active style when not provided.
 
     Args:
         surface (Surface): The pygame surface to draw onto.
@@ -238,29 +337,31 @@ def slider(
         value (int | float): The current value, used to position the handle.
         precision (int): Number of decimal places to display when show_value is
             True.
-        width (int | None): Track width in pixels, overrides config if provided.
-        height (int | None): Track height in pixels, overrides config if
-            provided.
-        handle_radius (int | None): Handle circle radius in pixels, overrides
-            config if provided.
-        border_width (int | None): Handle border thickness in pixels, overrides
-            config if provided.
-        font (pg.font.Font): Font used to render the text.
+        width (int | None): Track width in pixels.
+        height (int | None): Track thickness in pixels.
+        handle_radius (int | None): Handle circle radius in pixels.
+        border_width (int | None): Handle border thickness in pixels.
+        font (pg.font.Font): Font used to render the value readout.
         show_value (bool): Whether to render the current value above the handle.
-        color_track (RGBColor | None): Track fill color, overrides config if
-            provided.
+        color_track (RGBColor | None): Track fill color.
         color_track_filled (RGBColor | None): Color of the filled portion of the
-            track to the left of the handle, overrides config if provided.
-        color_handle (RGBColor | None): Handle fill color, overrides config if
-            provided.
-        color_border (RGBColor | None): Handle border color, overrides config if
-            provided.
-        color_text (RGBColor | None): Value readout text color, overrides config
-            if provided.
+            track to the left of the handle.
+        color_handle (RGBColor | None): Handle fill color.
+        color_border (RGBColor | None): Handle border color.
+        color_text (RGBColor | None): Label and value readout text color.
         hover_lighten (float | None): Fraction of the distance to white the
-            handle moves while hovered, overrides config if provided.
-        hovered (bool): Whether the pointer is over the handle. Defaults to
-            False.
+            handle moves while hovered.
+        hovered (bool): Whether the pointer is over the handle.
+        text (str | None): Label drawn at the top of the box, aligned with the
+            handle's left edge. Pass None to draw no label.
+        label_font (pg.font.Font | None): Font for the label, defaults to font.
+        padding (int | None): Space between the box edge and its contents.
+        box_border_width (int | None): Outer border thickness of the box.
+        box_border_width_inner (int | None): Inner bevel thickness of the box.
+        color_box_background (RGBColor | None): Box background color.
+        color_box_border (RGBColor | None): Box outer border color.
+        color_box_border_inner_light (RGBColor | None): Box light bevel color.
+        color_box_border_inner_dark (RGBColor | None): Box dark bevel color.
     """
 
     # Get all arguments, either from function input or config.
@@ -302,7 +403,54 @@ def slider(
 
     color_text = color_text if color_text is not None else get_style().slider.color_text
 
+    padding = padding if padding is not None else get_style().slider.padding
+
+    box_border_width = (
+        box_border_width
+        if box_border_width is not None
+        else get_style().slider.box_border_width
+    )
+
+    box_border_width_inner = (
+        box_border_width_inner
+        if box_border_width_inner is not None
+        else get_style().slider.box_border_width_inner
+    )
+
+    color_box_background = (
+        color_box_background
+        if color_box_background is not None
+        else get_style().slider.color_box_background
+    )
+
+    color_box_border = (
+        color_box_border
+        if color_box_border is not None
+        else get_style().slider.color_box_border
+    )
+
+    color_box_border_inner_light = (
+        color_box_border_inner_light
+        if color_box_border_inner_light is not None
+        else get_style().slider.color_box_border_inner_light
+    )
+
+    color_box_border_inner_dark = (
+        color_box_border_inner_dark
+        if color_box_border_inner_dark is not None
+        else get_style().slider.color_box_border_inner_dark
+    )
+
+    label_font = label_font if label_font is not None else font
+    label_height = label_font.size(text)[1] if text is not None else 0
+    readout_height = font.size("0")[1] if show_value else 0
+
     # Definitions depending on function/config input.
+    layout = slider_layout(padding, handle_radius, label_height, readout_height)
+    inset = padding + handle_radius
+    box_rect = pg.Rect(
+        x - inset, y - layout.track_center, width + 2 * inset, layout.height
+    )
     fraction = (value - start) / (stop - start)
     handle_x = x + int(fraction * width)
     handle_center = (handle_x, y)
@@ -310,6 +458,16 @@ def slider(
     track_filled_rect = pg.Rect(x, y - height // 2, handle_x - x, height)
 
     # Drawing operations.
+    _draw_bevelled_box(
+        surface,
+        box_rect,
+        color_box_background,
+        color_box_border,
+        box_border_width,
+        color_box_border_inner_light,
+        color_box_border_inner_dark,
+        box_border_width_inner,
+    )
     pg.draw.rect(surface, color_track, track_rect)
     pg.draw.rect(surface, color_track_filled, track_filled_rect)
     pg.draw.circle(surface, color_handle, handle_center, handle_radius)
@@ -317,12 +475,23 @@ def slider(
 
     if show_value:
         text_surface = font.render(f"{value:.{precision}f}", True, color_text)
-
-        text_rect = text_surface.get_rect(
-            midbottom=(handle_center[0], handle_center[1] - handle_radius - 4)
+        readout_bottom = box_rect.y + layout.readout_top + readout_height
+        text_rect = text_surface.get_rect(midbottom=(handle_x, readout_bottom))
+        readout_area = pg.Rect(
+            box_rect.x + padding,
+            box_rect.y,
+            box_rect.width - 2 * padding,
+            box_rect.height,
         )
-
+        text_rect.clamp_ip(readout_area)
         surface.blit(text_surface, text_rect)
+
+    if text is not None:
+        label_surface = label_font.render(text, True, color_text)
+        label_rect = label_surface.get_rect(
+            topleft=(box_rect.x + padding, box_rect.y + padding)
+        )
+        surface.blit(label_surface, label_rect)
 
 
 def dropdown_header(
@@ -480,41 +649,16 @@ def dropdown_header(
 
     # Definitions depending on function/config input.
     rect = pg.Rect(x, y, width, height)
-    inner_rect = rect.inflate(-border_width * 2, -border_width * 2)
 
     # Drawing operations.
-    pg.draw.rect(surface, color_background, rect)
-    pg.draw.rect(surface, color_border, rect, border_width)
-
-    pg.draw.line(
+    _draw_bevelled_box(
         surface,
+        rect,
+        color_background,
+        color_border,
+        border_width,
         color_border_inner_light,
-        inner_rect.topleft,
-        inner_rect.topright,
-        border_width_inner,
-    )
-
-    pg.draw.line(
-        surface,
-        color_border_inner_light,
-        inner_rect.topleft,
-        inner_rect.bottomleft,
-        border_width_inner,
-    )
-
-    pg.draw.line(
-        surface,
         color_border_inner_dark,
-        inner_rect.bottomleft,
-        inner_rect.bottomright,
-        border_width_inner,
-    )
-
-    pg.draw.line(
-        surface,
-        color_border_inner_dark,
-        inner_rect.topright,
-        inner_rect.bottomright,
         border_width_inner,
     )
 

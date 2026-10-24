@@ -151,6 +151,7 @@ def test_slider_handle_hovered_lightens_handle(
     draw.slider(
         surface=screen,
         font=font,
+        width=540,
         x=20,
         y=100,
         start=0,
@@ -325,3 +326,138 @@ def test_dropdown_options_top_border_overlaps_header_bottom_border(
     assert tuple(header_bottom_border)[:3] == (1, 2, 3)
     assert tuple(header_bottom_border_inner)[:3] == (1, 2, 3)
     assert tuple(first_row)[:3] == (8, 9, 10)
+
+
+def test_slider_text_is_drawn_above_the_track_at_its_left_edge(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
+    screen.fill((255, 255, 255))
+
+    draw.slider(
+        surface=screen,
+        font=font,
+        label_font=font,
+        text="Speed",
+        width=540,
+        x=20,
+        y=100,
+        start=0,
+        stop=10,
+        value=5,
+        precision=1,
+    )
+
+    label_pixels = [
+        (x, y)
+        for x in range(0, 200)
+        for y in range(40, 90)
+        if tuple(screen.get_at((x, y)))[:3] != (255, 255, 255)
+    ]
+
+    assert label_pixels
+    assert min(x for x, _ in label_pixels) <= 20 - 16 + 3
+
+
+def test_slider_label_is_drawn_above_the_value_readout(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
+    screen.fill((255, 255, 255))
+
+    draw.slider(
+        surface=screen,
+        font=font,
+        label_font=font,
+        text="Speed",
+        show_value=True,
+        width=540,
+        x=20,
+        y=100,
+        start=0,
+        stop=10,
+        value=5,
+        precision=1,
+        color_box_background=(255, 255, 255),
+        color_box_border=(255, 255, 255),
+        color_box_border_inner_light=(255, 255, 255),
+        color_box_border_inner_dark=(255, 255, 255),
+    )
+
+    label_pixels = [
+        (x, y)
+        for x in range(20, 120)
+        for y in range(40, 90)
+        if tuple(screen.get_at((x, y)))[:3] != (255, 255, 255)
+    ]
+
+    assert label_pixels
+    assert max(y for _, y in label_pixels) < 100 - 16
+
+
+def test_slider_with_no_text_draws_no_label(screen: pg.Surface, font: pg.font.Font) -> None:
+    screen.fill((255, 255, 255))
+
+    draw.slider(
+        surface=screen,
+        font=font,
+        text=None,
+        width=540,
+        x=20,
+        y=100,
+        start=0,
+        stop=10,
+        value=5,
+        precision=1,
+        color_box_background=(255, 255, 255),
+        color_box_border=(255, 255, 255),
+        color_box_border_inner_light=(255, 255, 255),
+        color_box_border_inner_dark=(255, 255, 255),
+    )
+
+    label_region = [
+        screen.get_at((x, y)) for x in range(20, 120) for y in range(40, 90)
+    ]
+
+    assert all(tuple(pixel)[:3] == (255, 255, 255) for pixel in label_region)
+
+
+def test_slider_value_readout_stays_inside_the_box_padding_at_the_left_end(
+    screen: pg.Surface, font: pg.font.Font
+) -> None:
+    screen.fill((255, 255, 255))
+    padding = 4
+    handle_radius = 10
+    box_left = 20 - handle_radius - padding
+
+    draw.slider(
+        surface=screen,
+        font=font,
+        width=300,
+        height=12,
+        handle_radius=handle_radius,
+        padding=padding,
+        x=20,
+        y=100,
+        start=0,
+        stop=10,
+        value=0,
+        precision=2,
+        show_value=True,
+        text=None,
+        color_text=(0, 0, 0),
+        color_box_background=(255, 255, 255),
+        color_box_border=(255, 255, 255),
+        color_box_border_inner_light=(255, 255, 255),
+        color_box_border_inner_dark=(255, 255, 255),
+        box_border_width=0,
+        box_border_width_inner=0,
+    )
+
+    readout_pixels = [
+        x
+        for x in range(0, 200)
+        for y in range(0, 90)
+        if tuple(screen.get_at((x, y)))[:3] == (0, 0, 0)
+    ]
+
+    assert readout_pixels
+    assert min(readout_pixels) >= box_left + padding

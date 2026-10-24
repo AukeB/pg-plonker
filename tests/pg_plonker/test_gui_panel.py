@@ -87,18 +87,6 @@ def test_add_button_centers_and_stacks_controls(screen: pg.Surface) -> None:
 # Testing the "add_slider" method from the "GUIPanel" class.
 
 
-def test_add_slider_reserves_vertical_margins(screen: pg.Surface) -> None:
-    panel = GUIPanel(surface=screen)
-
-    slider = panel.add_slider(start=0, stop=10, value=5)
-
-    assert slider.y == 40 + slider.margin_vertical + slider.rect.height // 2
-    assert (
-        panel._next_control_y
-        == 40 + slider.margin_vertical * 2 + slider.rect.height + 24
-    )
-
-
 # Testing the "add_dropdown" method from the "GUIPanel" class.
 
 
@@ -273,3 +261,35 @@ def test_draw_renders_controls_and_divider(screen: pg.Surface) -> None:
     panel.draw()
 
     assert pg.transform.average_color(screen)[:3] != (0, 0, 0)
+
+
+# Testing the slider value readout inside the "add_slider" method from the "GUIPanel" class.
+
+
+# Testing the slider box inside the "add_slider" method from the "GUIPanel" class.
+
+
+def test_add_slider_box_starts_at_the_cursor_and_is_centred(screen: pg.Surface) -> None:
+    panel = GUIPanel(surface=screen)
+
+    slider = panel.add_slider(start=0, stop=10, text=None)
+
+    assert slider.rect.top == 40
+    assert slider.rect.left == (620 - slider.rect.width) // 2
+
+
+def test_next_control_moves_down_by_the_slider_box_height(screen: pg.Surface) -> None:
+    panel = GUIPanel(surface=screen)
+    slider = panel.add_slider(start=0, stop=10, show_value=True, text="Speed")
+
+    button = panel.add_button(text="Grid")
+
+    assert button.rect.top == slider.rect.bottom + 24
+
+
+def test_slider_with_value_shown_is_taller_than_without(screen: pg.Surface) -> None:
+    panel = GUIPanel(surface=screen)
+    hidden = panel.add_slider(start=0, stop=10, text=None)
+    shown = panel.add_slider(start=0, stop=10, show_value=True, text=None)
+
+    assert shown.rect.height > hidden.rect.height
